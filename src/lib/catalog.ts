@@ -106,9 +106,9 @@ export async function flashSaleProducts(limit = 6): Promise<UnifiedProduct[]> {
   return list.map(toUnified);
 }
 
-export async function brands(): Promise<{ name: string; slug: string; tagline?: string | null; heroNote?: string | null }[]> {
+export async function brands(): Promise<{ name: string; slug: string; tagline?: string | null; heroNote?: string | null; heroImage?: string | null }[]> {
   const list = await prisma.brand.findMany({ orderBy: { name: "asc" } });
-  return list.map((b) => ({ name: b.name, slug: b.slug, tagline: b.tagline, heroNote: b.heroNote }));
+  return list.map((b) => ({ name: b.name, slug: b.slug, tagline: b.tagline, heroNote: b.heroNote, heroImage: b.heroImage }));
 }
 
 export async function productsByBrandSlug(brandSlug: string, limit = 6): Promise<UnifiedProduct[]> {

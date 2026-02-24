@@ -1,37 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { UnifiedProduct } from "@/data/unifiedProduct";
-import ProductCard from "@/components/ProductCard";
 
-type Brand = { name: string; slug: string; tagline?: string | null; heroNote?: string | null };
+type Brand = { name: string; slug: string; tagline?: string | null; heroNote?: string | null; heroImage?: string | null };
 
 export default function BrandShowcaseClient({ brands }: { brands: Brand[] }) {
-  const first = brands[0]?.slug;
-  const [active, setActive] = useState<string>(first || "");
-  const [loading, setLoading] = useState(false);
-  const [items, setItems] = useState<UnifiedProduct[]>([]);
+  const [active, setActive] = useState<string>(brands[0]?.slug || "");
 
   const activeBrand = useMemo(() => brands.find((b) => b.slug === active), [brands, active]);
-
-  useEffect(() => {
-    if (!active) return;
-    let cancel = false;
-    setLoading(true);
-    fetch(`/api/brands/${encodeURIComponent(active)}`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (cancel) return;
-        setItems(d.products || []);
-      })
-      .finally(() => {
-        if (!cancel) setLoading(false);
-      });
-    return () => {
-      cancel = true;
-    };
-  }, [active]);
 
   return (
     <>
@@ -55,29 +32,31 @@ export default function BrandShowcaseClient({ brands }: { brands: Brand[] }) {
       <div className="mt-6 rounded-2xl border bg-gradient-to-br from-rose-50 to-white p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-widest text-rose-600">{activeBrand?.tagline || "Luxury"}</div>
+            <div className="text-xs uppercase tracking-widest text-rose-600">
+              {activeBrand?.tagline || "Luxury"}
+            </div>
             <div className="mt-1 text-lg font-semibold">{activeBrand?.name || ""}</div>
             <div className="mt-2 text-sm opacity-70">{activeBrand?.heroNote || ""}</div>
           </div>
           <Link
             href="/collections/all"
-            className="rounded-xl border bg-white px-4 py-2 text-sm hover:bg-zinc-50"
+            className="shrink-0 rounded-xl border bg-white px-4 py-2 text-sm hover:bg-zinc-50"
           >
             Xem tất cả
           </Link>
         </div>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-2">
-          {loading ? (
-            [0, 1].map((i) => (
-              <div key={i} className="h-44 rounded-2xl border bg-white/70" />
-            ))
-          ) : items.length > 0 ? (
-            items.slice(0, 2).map((p) => <ProductCard key={p.handle} p={p} />)
+        {/* Ảnh brand — chiều cao cố định, không thay đổi layout */}
+        <div className="mt-5 h-48 overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-100 to-white flex items-center justify-center">
+          {activeBrand?.heroImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={activeBrand.heroImage}
+              alt={activeBrand.name}
+              className="h-full w-full object-cover"
+            />
           ) : (
-            <div className="rounded-2xl border bg-white p-4 text-sm opacity-70 sm:col-span-2">
-              Chưa có sản phẩm cho thương hiệu này.
-            </div>
+            <span className="text-2xl font-semibold opacity-20">{activeBrand?.name}</span>
           )}
         </div>
       </div>
