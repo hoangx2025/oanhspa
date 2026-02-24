@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "Bash(tail:*)",
+      "Bash(cd /d/oanhspa && npx prisma migrate dev --name add_admin_auth_s3 2>&1)",
+      "Bash(cd /d/oanhspa && npx prisma generate 2>&1)",
+      "Bash(head:*)",
+      "Bash(taskkill:*)",
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(cd /d/oanhspa && npm run dev 2>&1)",
+      "Bash(curl:*)",
+      "Bash(powershell:*)",
+      "Bash(echo No process on port 3000:*)",
+      "Bash(cmd:*)",
+      "Bash(netstat -ano | grep :3000 2>&1)"
     ]
   }
 }

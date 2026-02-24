@@ -38,8 +38,8 @@ export default async function ProductPage({ params }: { params: { handle: string
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
         {/* LEFT */}
-        <div className="rounded-3xl border bg-white shadow-soft">
-          <div className="overflow-hidden rounded-3xl">
+        <div className="rounded-xl border bg-white shadow-soft">
+          <div className="overflow-hidden rounded-xl">
             {images.length > 0 ? (
               <ImageSlider images={images} altBase={p.title} youtubeUrl={p.youtubeUrl} fit="cover" />
             ) : (

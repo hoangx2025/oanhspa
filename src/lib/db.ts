@@ -6,6 +6,7 @@ declare global {
 }
 
 export const prisma = globalThis.__prisma ?? new PrismaClient();
+export const db = prisma;
 
 if (process.env.NODE_ENV !== "production") {
   globalThis.__prisma = prisma;

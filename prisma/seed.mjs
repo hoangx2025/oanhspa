@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -1078,6 +1079,8 @@ const PRODUCTS = [
 
 async function main() {
   // Reset demo
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
   await prisma.marketplaceLink.deleteMany();
   await prisma.productImage.deleteMany();
   await prisma.file.deleteMany();
@@ -1173,6 +1176,93 @@ async function main() {
   }
 
   console.log(`✅ Seed done — ${PRODUCTS.length} sản phẩm`);
+
+  // ─── Sample Orders ─────────────────────────────────────────────────────────
+  // Lấy tất cả sản phẩm theo danh mục để tạo đơn mẫu thực tế
+  const skincareProds    = await prisma.product.findMany({ where: { category: { name: "Skincare" } }, include: { variants: true } });
+  const collagenProds    = await prisma.product.findMany({ where: { category: { name: "Bổ sung Collagen" } }, include: { variants: true } });
+  const antiagingProds   = await prisma.product.findMany({ where: { category: { name: "Chống lão hóa" } }, include: { variants: true } });
+
+  const now = new Date();
+  const thisMonth = (daysAgo) => new Date(now.getFullYear(), now.getMonth(), now.getDate() - daysAgo);
+
+  const PLATFORMS = ["shopee", "lazada", "tiki", "website"];
+
+  // Helper: tạo đơn hàng có nhiều item
+  async function seedOrder(platform, daysAgo, items) {
+    const order = await prisma.order.create({
+      data: {
+        platform,
+        externalId: `${platform.toUpperCase()}-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
+        orderedAt: thisMonth(daysAgo),
+        status: "completed",
+      },
+    });
+    for (const { product, qty } of items) {
+      const v = product.variants[0];
+      if (!v) continue;
+      await prisma.orderItem.create({
+        data: { orderId: order.id, productId: product.id, variantId: v.id, quantity: qty, price: v.price },
+      });
+    }
+  }
+
+  // Skincare — nhiều nhất (tháng hiện tại)
+  for (let i = 0; i < 18; i++) {
+    const prod = skincareProds[i % skincareProds.length];
+    await seedOrder(PLATFORMS[i % 4], i, [{ product: prod, qty: Math.floor(Math.random() * 4) + 1 }]);
+  }
+
+  // Chống lão hóa — đứng thứ hai
+  for (let i = 0; i < 11; i++) {
+    const prod = antiagingProds[i % antiagingProds.length];
+    await seedOrder(PLATFORMS[i % 4], i, [{ product: prod, qty: Math.floor(Math.random() * 3) + 1 }]);
+  }
+
+  // Bổ sung Collagen — ít nhất
+  for (let i = 0; i < 5; i++) {
+    const prod = collagenProds[i % collagenProds.length];
+    await seedOrder("shopee", i, [{ product: prod, qty: 1 }]);
+  }
+
+  console.log(`✅ Sample orders seeded`);
+
+  // ─── Admin Auth Seed ───────────────────────────────────────────────────────
+  // Idempotent: upsert role + user
+  const adminRole = await prisma.aspNetRoles.upsert({
+    where: { name: "Admin" },
+    update: {},
+    create: {
+      name: "Admin",
+      normalizedName: "ADMIN",
+      concurrencyStamp: crypto.randomUUID(),
+    },
+  });
+
+  const passwordHash = await bcrypt.hash("Admin@123456", 10);
+  const adminUser = await prisma.aspNetUsers.upsert({
+    where: { email: "admin@oanhspa.com" },
+    update: {},
+    create: {
+      userName: "admin@oanhspa.com",
+      normalizedUserName: "ADMIN@OANHSPA.COM",
+      email: "admin@oanhspa.com",
+      normalizedEmail: "ADMIN@OANHSPA.COM",
+      emailConfirmed: true,
+      passwordHash,
+      securityStamp: crypto.randomUUID(),
+      concurrencyStamp: crypto.randomUUID(),
+    },
+  });
+
+  // Assign Admin role
+  await prisma.aspNetUserRoles.upsert({
+    where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
+    update: {},
+    create: { userId: adminUser.id, roleId: adminRole.id },
+  });
+
+  console.log(`✅ Admin user seeded: admin@oanhspa.com / Admin@123456`);
 }
 
 main()

@@ -3,14 +3,27 @@ import FlashSale from "@/components/FlashSale";
 import ProductGrid from "@/components/ProductGrid";
 import Tabs from "@/components/Tabs";
 import BrandShowcase from "@/components/BrandShowcase";
-import { brands, hotWeek, productsByCategory } from "@/lib/catalog";
+import { brands, hotWeek, productsByCategory, salesByCategory } from "@/lib/catalog";
 
 export default async function HomePage() {
-  const brandList = await brands();
-  const hot = await hotWeek();
-  const skincare = await productsByCategory("Skincare");
-  const collagen = await productsByCategory("Bổ sung Collagen");
-  const antiaging = await productsByCategory("Chống lão hóa");
+  const [brandList, hot, salesRanking] = await Promise.all([
+    brands(),
+    hotWeek(),
+    salesByCategory(),   // tổng hợp theo tháng hiện tại
+  ]);
+
+  // Lấy sản phẩm cho từng category (song song)
+  const categoryData = await Promise.all(
+    salesRanking.map(({ categoryName }) => productsByCategory(categoryName))
+  );
+
+  // Build tab items — đã sort theo doanh số
+  const tabItems = salesRanking.map(({ categoryName, totalSold }, idx) => ({
+    key: categoryName.toLowerCase().replace(/\s+/g, "-"),
+    label: categoryName,
+    count: totalSold > 0 ? totalSold : undefined,
+    content: <ProductGrid products={categoryData[idx]} />,
+  }));
 
   return (
     <main>
@@ -42,7 +55,6 @@ export default async function HomePage() {
             <div>
               <div className="text-xs uppercase tracking-widest text-rose-600">Hot</div>
               <h2 className="mt-2 text-2xl font-semibold">Hot trong tuần qua</h2>
-              <p className="mt-1 text-sm opacity-70">Block mô phỏng slider/hot products.</p>
             </div>
             <Link className="text-sm hover:text-rose-600" href="/collections/all">Xem tất cả →</Link>
           </div>
@@ -54,30 +66,34 @@ export default async function HomePage() {
           <FlashSale />
         </section>
 
-        {/* Best sellers tabs */}
+        {/* Best sellers tabs — sorted by monthly sales */}
         <section className="mt-12">
-          <div>
-            <h2 className="text-2xl font-semibold">Bán chạy trong tháng</h2>
-            <p className="mt-1 text-sm opacity-70">
-              Có tab theo nhóm: Skincare / Bổ sung Collagen / Chống lão hóa (mô phỏng theo site demo).
-            </p>
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-semibold">Bán chạy trong tháng</h2>
+              <p className="mt-1 text-sm opacity-70">
+                Danh mục xếp theo số lượng đã bán trong tháng này.
+              </p>
+            </div>
+            {salesRanking[0]?.totalSold > 0 && (
+              <div className="text-xs text-zinc-400 hidden sm:block">
+                Cập nhật theo đơn hàng thực tế
+              </div>
+            )}
           </div>
 
           <div className="mt-5">
-            <Tabs
-              items={[
-                { key: "skincare", label: "Skincare", content: <ProductGrid products={skincare} /> },
-                { key: "collagen", label: "Bổ sung Collagen", content: <ProductGrid products={collagen} /> },
-                { key: "antiaging", label: "Chống lão hóa", content: <ProductGrid products={antiaging} /> }
-              ]}
-            />
+            {tabItems.length > 0 ? (
+              <Tabs items={tabItems} />
+            ) : (
+              <p className="text-sm text-zinc-400">Chưa có dữ liệu danh mục.</p>
+            )}
           </div>
         </section>
 
         {/* Banner strip */}
         <section className="mt-12 grid gap-4 md:grid-cols-3">
           {[
-            { title: "Ưu đãi thành viên", desc: "Đăng ký nhận tin để nhận mã giảm giá" },
             { title: "Giao hàng nhanh", desc: "Miễn phí từ 500.000đ" },
             { title: "Tư vấn 24/7", desc: "Hỗ trợ chọn sản phẩm phù hợp" }
           ].map(b => (

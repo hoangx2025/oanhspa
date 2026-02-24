@@ -49,6 +49,7 @@ model Product {
   variants          Variant[]
   images            ProductImage[]
   marketplaces      MarketplaceLink[]
+  orderItems        OrderItem[]
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -111,4 +112,126 @@ model MarketplaceLink {
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
+}
+
+model AspNetUsers {
+  id                   String    @id @default(cuid())
+  userName             String?   @unique
+  normalizedUserName   String?   @unique
+  email                String?   @unique
+  normalizedEmail      String?   @unique
+  emailConfirmed       Boolean   @default(false)
+  passwordHash         String?
+  securityStamp        String?
+  concurrencyStamp     String?
+  phoneNumber          String?
+  phoneNumberConfirmed Boolean   @default(false)
+  twoFactorEnabled     Boolean   @default(false)
+  lockoutEnd           DateTime?
+  lockoutEnabled       Boolean   @default(true)
+  accessFailedCount    Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  userRoles   AspNetUserRoles[]
+  userClaims  AspNetUserClaims[]
+  userLogins  AspNetUserLogins[]
+  userTokens  AspNetUserTokens[]
+}
+
+model AspNetRoles {
+  id               String  @id @default(cuid())
+  name             String? @unique
+  normalizedName   String? @unique
+  concurrencyStamp String?
+  userRoles  AspNetUserRoles[]
+  roleClaims AspNetRoleClaims[]
+}
+
+model AspNetUserRoles {
+  userId String
+  roleId String
+  user AspNetUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role AspNetRoles @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
+  @@index([roleId])
+}
+
+model AspNetUserClaims {
+  id         Int     @id @default(autoincrement())
+  userId     String
+  claimType  String?
+  claimValue String?
+  user AspNetUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
+}
+
+model AspNetRoleClaims {
+  id         Int     @id @default(autoincrement())
+  roleId     String
+  claimType  String?
+  claimValue String?
+  role AspNetRoles @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@index([roleId])
+}
+
+model AspNetUserLogins {
+  loginProvider       String
+  providerKey         String
+  providerDisplayName String?
+  userId              String
+  user AspNetUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([loginProvider, providerKey])
+  @@index([userId])
+}
+
+model AspNetUserTokens {
+  userId        String
+  loginProvider String
+  name          String
+  value         String?
+  user AspNetUsers @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([userId, loginProvider, name])
+}
+
+model Order {
+  id         Int         @id @default(autoincrement())
+  platform   String      // shopee | lazada | tiki | sendo | website | other
+  externalId String?     // mã đơn hàng trên sàn
+  orderedAt  DateTime    @default(now())
+  status     String      @default("completed") // completed | pending | cancelled | returned
+  note       String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  items      OrderItem[]
+
+  @@index([platform])
+  @@index([orderedAt])
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  variantId Int?
+  quantity  Int     @default(1)
+  price     Int     // giá tại thời điểm đặt hàng
+
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model S3Config {
+  id              Int      @id @default(autoincrement())
+  label           String   @default("default")
+  bucket          String
+  region          String
+  accessKeyId     String
+  secretAccessKey String
+  endpoint        String?
+  isDefault       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

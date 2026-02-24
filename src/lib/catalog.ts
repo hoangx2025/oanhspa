@@ -121,6 +121,45 @@ export async function productsByBrandSlug(brandSlug: string, limit = 6): Promise
   return list.map(toUnified);
 }
 
+/** Tổng hợp số lượng bán theo category, sort từ cao xuống thấp.
+ *  @param sinceDate  lọc từ ngày này trở đi (mặc định đầu tháng hiện tại)
+ */
+export async function salesByCategory(sinceDate?: Date): Promise<{ categoryName: string; totalSold: number }[]> {
+  const from = sinceDate ?? new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+  // Lấy tất cả categories
+  const allCats = await prisma.category.findMany({ select: { name: true } });
+
+  // Raw query: join OrderItem → Product → Category, lọc theo tháng
+  const rows = await prisma.orderItem.groupBy({
+    by: ["productId"],
+    where: { order: { orderedAt: { gte: from }, status: { not: "cancelled" } } },
+    _sum: { quantity: true },
+  });
+
+  // Join với product→category
+  const productIds = rows.map((r) => r.productId);
+  const products = productIds.length
+    ? await prisma.product.findMany({
+        where: { id: { in: productIds } },
+        select: { id: true, category: { select: { name: true } } },
+      })
+    : [];
+
+  const catMap = new Map<string, number>();
+  for (const cat of allCats) catMap.set(cat.name, 0);
+  for (const row of rows) {
+    const prod = products.find((p) => p.id === row.productId);
+    if (!prod) continue;
+    const cat = prod.category.name;
+    catMap.set(cat, (catMap.get(cat) ?? 0) + (row._sum.quantity ?? 0));
+  }
+
+  return Array.from(catMap.entries())
+    .map(([categoryName, totalSold]) => ({ categoryName, totalSold }))
+    .sort((a, b) => b.totalSold - a.totalSold);
+}
+
 export async function productsByCategory(categoryName: string, limit = 12): Promise<UnifiedProduct[]> {
   const list = await prisma.product.findMany({
     where: { category: { name: categoryName } },

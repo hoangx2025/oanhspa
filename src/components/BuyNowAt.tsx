@@ -1,4 +1,3 @@
-import BuyNow from "@/components/BuyNow";
 import type { MarketplaceLink } from "@/data/marketplaceLink";
 
 export default function BuyNowAt({
@@ -18,10 +17,21 @@ export default function BuyNowAt({
         </div>
       </div>
 
-      {/* Các link sàn (Shopee/Lazada/TikTok...) */}
-      <div className="mt-4">
-        <BuyNow links={links} title="Mua qua sàn" />
-      </div>
+      {links && links.length > 0 && (
+        <div className="mt-4 flex flex-col gap-2">
+          {links.map((l, i) => (
+            <a
+              key={i}
+              href={l.affiliateUrl ?? l.productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-zinc-50"
+            >
+              {l.platform}
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ export default function MarketplaceLinks({ links, productTitle }: { links: Marke
   const shopeeUrl = shopeeLink?.affiliateUrl || shopeeLink?.productUrl;
 
   return (
-    <div className="border-t bg-white px-4 pt-4 pb-5">
+    <div className="border-t bg-white px-4 pt-4 pb-1">
       <div className="text-sm font-semibold">Mua ngay tại</div>
 
       
@@ -45,6 +45,8 @@ export default function MarketplaceLinks({ links, productTitle }: { links: Marke
       </p>
 
       {/* Voucher */}
+
+      <div className="text-sm font-semibold mt-4">Quý khách hàng có thể lấy voucher bên dưới để giảm giá ngay tại cửa hàng</div>
       <VoucherSection shopeeUrl={shopeeUrl} productTitle={productTitle} />
     </div>
   );
