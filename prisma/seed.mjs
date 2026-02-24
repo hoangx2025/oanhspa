@@ -157,6 +157,8 @@ const PRODUCTS = [
 async function main() {
   // Reset demo
   await prisma.marketplaceLink.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.file.deleteMany();
   await prisma.variant.deleteMany();
   await prisma.product.deleteMany();
   await prisma.brand.deleteMany();
@@ -189,33 +191,69 @@ async function main() {
         title: p.title,
         short: p.short,
         description: p.description,
-        price: p.price,
-        compareAtPrice: p.compareAtPrice ?? null,
         imageHint: p.imageHint ?? null,
         isHot: !!p.isHot,
         isBest: !!p.isBest,
         flashSaleEndsAt: p.flashSaleEndsAt ? new Date(p.flashSaleEndsAt) : null,
-        imagesJson: JSON.stringify(p.images ?? []),
         youtubeUrl: p.youtubeUrl ?? null,
         brandId: brand.id,
         categoryId: category.id,
       },
     });
 
-    const variants = p.variants ?? [];
-    for (let i = 0; i < variants.length; i++) {
-      const v = variants[i];
-      await prisma.variant.create({
+    // Images -> File + ProductImage
+    const imgs = (p.images ?? []).filter((x) => (x || "").trim().length > 0);
+    for (let i = 0; i < imgs.length; i++) {
+      const url = imgs[i];
+      const f = await prisma.file.upsert({
+        where: { url },
+        update: {},
+        create: {
+          url,
+          kind: "IMAGE",
+          name: url.split("/").pop() || null,
+        },
+      });
+      await prisma.productImage.create({
         data: {
           productId: created.id,
-          name: v.name,
-          value: v.value,
-          price: v.price ?? null,
-          compareAt: v.compareAt ?? null,
-          sku: v.sku ?? null,
+          fileId: f.id,
           sortOrder: i,
         },
       });
+    }
+
+    const variants = p.variants ?? [];
+    if (!variants.length) {
+      // fallback 1 variant
+      await prisma.variant.create({
+        data: {
+          productId: created.id,
+          name: "Biến thể",
+          value: "Tiêu chuẩn",
+          price: p.price,
+          compareAt: p.compareAtPrice ?? null,
+          stock: 50,
+          sku: null,
+          sortOrder: 0,
+        },
+      });
+    } else {
+      for (let i = 0; i < variants.length; i++) {
+        const v = variants[i];
+        await prisma.variant.create({
+          data: {
+            productId: created.id,
+            name: v.name,
+            value: v.value,
+            price: v.price ?? p.price,
+            compareAt: v.compareAt ?? p.compareAtPrice ?? null,
+            stock: v.stock ?? 50,
+            sku: v.sku ?? null,
+            sortOrder: i,
+          },
+        });
+      }
     }
 
     const links = p.marketplaces ?? [];

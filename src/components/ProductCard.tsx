@@ -1,9 +1,8 @@
 import Link from "next/link";
 import type { UnifiedProduct } from "@/data/unifiedProduct";
-import { discountPercent, formatVND } from "@/lib/money";
+ 
 
 export default function ProductCard({ p }: { p: UnifiedProduct }) {
-  const off = discountPercent(p.price, p.compareAtPrice);
   const firstImg = (p.images || []).find((x) => (x || "").trim().length > 0);
 
   return (
@@ -34,9 +33,7 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
           ) : null}
         </div>
 
-        {off > 0 ? (
-          <div className="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-1 text-[11px] font-semibold">-{off}%</div>
-        ) : null}
+        {/* Bỏ hiển thị giảm giá/giá ở danh sách (giá nằm ở biến thể trong trang chi tiết) */}
       </Link>
 
       <div className="mt-4">
@@ -44,13 +41,6 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
         <Link href={`/products/${p.handle}`} className="mt-1 line-clamp-2 font-semibold leading-snug hover:text-rose-600">
           {p.title}
         </Link>
-
-        <div className="mt-2 flex items-baseline gap-2">
-          <div className="text-sm font-semibold text-zinc-900">{formatVND(p.price)}</div>
-          {p.compareAtPrice ? (
-            <div className="text-xs line-through opacity-50">{formatVND(p.compareAtPrice)}</div>
-          ) : null}
-        </div>
 
         <div className="mt-3 flex items-center justify-between">
           <div className="text-xs opacity-70">{p.category}</div>

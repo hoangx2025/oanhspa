@@ -57,9 +57,11 @@ export type UnifiedProduct = {
 };
 
 export type ProductVariant = {
+  id?: string;
   name: string; // VD: "Dung tích"
   value: string; // VD: "30ml"
-  price?: number; // nếu mỗi biến thể có giá riêng
+  price: number; // giá của biến thể
   compareAtPrice?: number;
+  stock?: number;
   sku?: string;
 };

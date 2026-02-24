@@ -8,25 +8,10 @@ export default function MarketplaceLinks({
   if (!links?.length) return null;
 
   return (
-    <div  className="card" 
-      style={{
-        marginTop: 16,
-        padding: 14,
-        borderRadius: 12,
-        border: "1px solid var(--border)",
-        background: "#fff",
-      }}
-    >
-      <h2 style={{ margin: "0 0 8px", fontSize: 16 }}>Mua ngay tại</h2>
+    <div className="border-t bg-white p-4">
+      <h2 className="text-sm font-semibold">Mua ngay tại</h2>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 16,
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="mt-3 flex flex-wrap items-center gap-4">
         {links.map((item) => {
           const meta = MARKETPLACE_META[item.platform];
           if (!meta) return null;
@@ -40,21 +25,13 @@ export default function MarketplaceLinks({
               target="_blank"
               rel="nofollow sponsored noopener"
               title={`Mua trên ${meta.name}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: 35,
-              }}
+              className="flex h-9 items-center justify-center rounded-xl border bg-white px-3 hover:bg-zinc-50"
             >
               <img
                 src={meta.icon}
                 alt={meta.name}
                 height={35}
-                style={{
-                  width: "auto",
-                  objectFit: "contain",
-                }}
+                className="h-7 w-auto object-contain"
               />
             </a>
           );

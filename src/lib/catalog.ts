@@ -1,25 +1,26 @@
 import { prisma } from "@/lib/db";
 import type { UnifiedProduct, ProductVariant } from "@/data/unifiedProduct";
 
-function parseImages(imagesJson: string | null | undefined): string[] {
-  try {
-    const arr = JSON.parse(imagesJson || "[]");
-    if (Array.isArray(arr)) return arr.filter((x) => typeof x === "string");
-    return [];
-  } catch {
-    return [];
-  }
-}
-
 function toUnified(p: any): UnifiedProduct {
-  const images = parseImages(p.imagesJson);
+  const images: string[] = (p.images || [])
+    .slice()
+    .sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+    .map((x: any) => x?.file?.url)
+    .filter((x: any) => typeof x === "string" && x.trim().length > 0);
+
   const variants: ProductVariant[] = (p.variants || []).map((v: any) => ({
+    id: String(v.id),
     name: v.name,
     value: v.value,
-    price: v.price ?? undefined,
+    price: v.price,
     compareAtPrice: v.compareAt ?? undefined,
+    stock: v.stock ?? 0,
     sku: v.sku ?? undefined,
   }));
+
+  // derive a default/base price from the first variant
+  const basePrice = variants[0]?.price ?? 0;
+  const baseCompareAt = variants[0]?.compareAtPrice;
 
   return {
     id: String(p.id),
@@ -27,8 +28,8 @@ function toUnified(p: any): UnifiedProduct {
     title: p.title,
     brand: p.brand?.name ?? "",
     category: p.category?.name ?? "",
-    price: p.price,
-    compareAtPrice: p.compareAtPrice ?? undefined,
+    price: basePrice,
+    compareAtPrice: baseCompareAt,
     currency: "VND",
     stockStatus: "in_stock",
     isHot: p.isHot,
@@ -52,6 +53,7 @@ export async function allProducts(): Promise<UnifiedProduct[]> {
     include: {
       brand: true,
       category: true,
+      images: { include: { file: true }, orderBy: { sortOrder: "asc" } },
       variants: { orderBy: { sortOrder: "asc" } },
       marketplaces: { orderBy: { sortOrder: "asc" } },
     },
@@ -66,6 +68,7 @@ export async function productByHandle(handle: string): Promise<UnifiedProduct | 
     include: {
       brand: true,
       category: true,
+      images: { include: { file: true }, orderBy: { sortOrder: "asc" } },
       variants: { orderBy: { sortOrder: "asc" } },
       marketplaces: { orderBy: { sortOrder: "asc" } },
     },
@@ -77,7 +80,7 @@ export async function bestSellers(limit = 6): Promise<UnifiedProduct[]> {
   const list = await prisma.product.findMany({
     where: { isBest: true },
     take: limit,
-    include: { brand: true, category: true, variants: true, marketplaces: true },
+    include: { brand: true, category: true, images: { include: { file: true }, orderBy: { sortOrder: "asc" } }, variants: true, marketplaces: true },
     orderBy: [{ updatedAt: "desc" }],
   });
   return list.map(toUnified);
@@ -87,7 +90,7 @@ export async function hotWeek(limit = 6): Promise<UnifiedProduct[]> {
   const list = await prisma.product.findMany({
     where: { isHot: true },
     take: limit,
-    include: { brand: true, category: true, variants: true, marketplaces: true },
+    include: { brand: true, category: true, images: { include: { file: true }, orderBy: { sortOrder: "asc" } }, variants: true, marketplaces: true },
     orderBy: [{ updatedAt: "desc" }],
   });
   return list.map(toUnified);
@@ -97,7 +100,7 @@ export async function flashSaleProducts(limit = 6): Promise<UnifiedProduct[]> {
   const list = await prisma.product.findMany({
     where: { flashSaleEndsAt: { not: null } },
     take: limit,
-    include: { brand: true, category: true, variants: true, marketplaces: true },
+    include: { brand: true, category: true, images: { include: { file: true }, orderBy: { sortOrder: "asc" } }, variants: true, marketplaces: true },
     orderBy: [{ flashSaleEndsAt: "asc" }],
   });
   return list.map(toUnified);
@@ -112,7 +115,7 @@ export async function productsByBrandSlug(brandSlug: string, limit = 6): Promise
   const list = await prisma.product.findMany({
     where: { brand: { slug: brandSlug } },
     take: limit,
-    include: { brand: true, category: true, variants: true, marketplaces: true },
+    include: { brand: true, category: true, images: { include: { file: true }, orderBy: { sortOrder: "asc" } }, variants: true, marketplaces: true },
     orderBy: [{ isBest: "desc" }, { updatedAt: "desc" }],
   });
   return list.map(toUnified);
@@ -122,7 +125,7 @@ export async function productsByCategory(categoryName: string, limit = 12): Prom
   const list = await prisma.product.findMany({
     where: { category: { name: categoryName } },
     take: limit,
-    include: { brand: true, category: true, variants: true, marketplaces: true },
+    include: { brand: true, category: true, images: { include: { file: true }, orderBy: { sortOrder: "asc" } }, variants: true, marketplaces: true },
     orderBy: [{ isBest: "desc" }, { updatedAt: "desc" }],
   });
   return list.map(toUnified);
