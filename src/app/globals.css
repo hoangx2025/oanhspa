@@ -11,3 +11,41 @@ html, body {
 body {
   background: var(--bg);
 }
+
+
+/* Floating Chat */
+
+.chatFloat {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 60;
+}
+
+.chatBtn {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.chatBtn:hover {
+  transform: translateY(-2px);
+}
+
+.chatZalo {
+  background: #0068ff;
+  color: white;
+}
+
+.chatMessenger {
+  background: #111;
+  color: white;
+}

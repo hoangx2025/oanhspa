@@ -1,6 +1,6 @@
-# Next.js F1GENZ-like Demo (Static)
+# Next.js OANH SPA-like Demo (Static)
 
-This project is a **static demo** inspired by the layout of Haravan theme "F1GENZ Beauty Cosmetic - Làm Đẹp".
+This project is a **static demo** inspired by the layout of Haravan theme "Beauty Cosmetic - Làm Đẹp".
 All products are **hardcoded** in `src/data/products.ts`.
 
 ## Run

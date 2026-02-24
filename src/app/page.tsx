@@ -13,10 +13,10 @@ export default function HomePage() {
           <div>
             <div className="text-xs uppercase tracking-widest text-rose-600">Làm đẹp tự nhiên</div>
             <h1 className="mt-3 text-3xl md:text-4xl font-semibold leading-tight">
-              Mỹ phẩm xuất xứ từ Hàn Quốc
+              Mỹ phẩm xách tay Hàn Quốc
             </h1>
             <p className="mt-4 text-sm md:text-base opacity-75">
-              Bố cục trang chủ mô phỏng theme F1GENZ Beauty Cosmetic: hero, thương hiệu, hot tuần qua, flash sale, tab bán chạy trong tháng.
+              Bố cục trang chủ mô phỏng theme OANH SPA Beauty Cosmetic: hero, thương hiệu, hot tuần qua, flash sale, tab bán chạy trong tháng.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/collections/all" className="rounded-xl bg-zinc-900 px-5 py-3 text-white text-sm">Mua ngay</Link>

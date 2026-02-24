@@ -1,18 +1,21 @@
-export type Product = {
-  id: string;
-  handle: string;
-  title: string;
-  brand: string;
-  category: "Skincare" | "Bổ sung Collagen" | "Chống lão hóa";
-  price: number;
-  compareAtPrice?: number;
-  imageHint?: "purple" | "amber" | "mint" | "rose" | "slate";
-  isHot?: boolean;
-  isBest?: boolean;
-  flashSaleEndsAtISO?: string; // if present => show countdown in Flash Sale block
-};
 
-export const PRODUCTS: Product[] = [
+import { UnifiedProduct } from "./unifiedProduct";
+
+// export type Product = {
+//   id: string;
+//   handle: string;
+//   title: string;
+//   brand: string;
+//   category: "Skincare" | "Bổ sung Collagen" | "Chống lão hóa";
+//   price: number;
+//   compareAtPrice?: number;
+//   imageHint?: "purple" | "amber" | "mint" | "rose" | "slate";
+//   isHot?: boolean;
+//   isBest?: boolean;
+//   flashSaleEndsAtISO?: string; // if present => show countdown in Flash Sale block
+// };
+
+export const PRODUCTS: UnifiedProduct[] = [
   {
     id: "p001",
     handle: "serum-ageless-total-anti-aging",
@@ -22,7 +25,9 @@ export const PRODUCTS: Product[] = [
     price: 1881000,
     compareAtPrice: 2200000,
     imageHint: "purple",
-    isBest: true
+    isBest: true,
+    currency: "VND",
+    stockStatus: "in_stock"
   },
   {
     id: "p002",
@@ -34,7 +39,9 @@ export const PRODUCTS: Product[] = [
     compareAtPrice: 1500000,
     imageHint: "amber",
     isBest: true,
-    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00"
+    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
+    currency: "VND",
+    stockStatus: "in_stock"
   },
   {
     id: "p003",
@@ -46,7 +53,9 @@ export const PRODUCTS: Product[] = [
     compareAtPrice: 1400000,
     imageHint: "mint",
     isHot: true,
-    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00"
+    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
+    stockStatus: "in_stock",
+    currency: "VND"
   },
   {
     id: "p004",
@@ -58,7 +67,9 @@ export const PRODUCTS: Product[] = [
     compareAtPrice: 2500000,
     imageHint: "slate",
     isBest: true,
-    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00"
+    flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
+    stockStatus: "in_stock",
+    currency: "VND"
   },
   {
     id: "p005",
@@ -69,7 +80,9 @@ export const PRODUCTS: Product[] = [
     price: 2355000,
     compareAtPrice: 2800000,
     imageHint: "rose",
-    isHot: true
+    isHot: true,
+    stockStatus: "in_stock",
+    currency: "VND"
   },
   {
     id: "p006",
@@ -79,7 +92,9 @@ export const PRODUCTS: Product[] = [
     category: "Skincare",
     price: 1853000,
     compareAtPrice: 2150000,
-    imageHint: "mint"
+    imageHint: "mint",
+    stockStatus: "in_stock",
+    currency: "VND"
   },
   {
     id: "p007",
@@ -89,7 +104,9 @@ export const PRODUCTS: Product[] = [
     category: "Chống lão hóa",
     price: 3220000,
     compareAtPrice: 3705000,
-    imageHint: "slate"
+    imageHint: "slate",
+    stockStatus: "in_stock",
+    currency: "VND"
   },
   {
     id: "p008",
@@ -100,6 +117,8 @@ export const PRODUCTS: Product[] = [
     price: 855000,
     compareAtPrice: 995000,
     imageHint: "amber",
-    isBest: true
+    isBest: true,
+    stockStatus: "in_stock",
+    currency: "VND"
   }
 ];

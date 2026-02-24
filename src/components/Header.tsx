@@ -31,7 +31,7 @@ export default function Header() {
 
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center gap-4">
         <Link href="/" className="font-semibold tracking-wide text-lg">
-          F1GENZ<span className="text-rose-500">.</span>
+          OANH SPA<span className="text-rose-500">.</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm ml-6">

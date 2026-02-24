@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="mt-16 border-t bg-zinc-50">
       <div className="mx-auto max-w-6xl px-4 py-12 grid gap-8 md:grid-cols-4">
         <div>
-          <div className="font-semibold text-lg">F1GENZ<span className="text-rose-500">.</span></div>
+          <div className="font-semibold text-lg">OANH SPA<span className="text-rose-500">.</span></div>
           <p className="mt-3 text-sm opacity-80">
             Demo giao diện (Next.js) mô phỏng bố cục theme mỹ phẩm: header, flash sale, tab bán chạy, blog, footer.
           </p>
@@ -29,14 +29,14 @@ export default function Footer() {
         <div>
           <div className="font-semibold">Liên hệ</div>
           <div className="mt-3 text-sm opacity-80 grid gap-1">
-            <div>Hotline: 1900 0000</div>
-            <div>Email: support@example.com</div>
+            <div>Hotline: </div>
+            <div>Email: </div>
             <div>Giờ làm việc: T2–T6 (9:00–17:30)</div>
           </div>
         </div>
       </div>
       <div className="border-t py-5 text-center text-xs opacity-70">
-        © {new Date().getFullYear()} Demo only • Không phải theme chính thức
+        © {new Date().getFullYear()} OANH SPA
       </div>
     </footer>
   );
