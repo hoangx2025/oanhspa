@@ -26,6 +26,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     price: 1881000,
     compareAtPrice: 2200000,
     imageHint: "purple",
+    description:"Đây là mô tả",
     isBest: true,
     currency: "VND",
     stockStatus: "in_stock",
@@ -41,6 +42,11 @@ export const PRODUCTS: UnifiedProduct[] = [
       },
     ],
     youtubeUrl: "https://youtu.be/LaBiz1TeT58?si=Emu125TNMQyPHGHJ",
+    variants: [
+      { id: "v30", label: "30ml" },
+      { id: "v50", label: "50ml", price: 1990000 },
+      { id: "v100", label: "100ml", stockStatus: "out_of_stock" },
+    ],
   },
   {
     id: "p002",

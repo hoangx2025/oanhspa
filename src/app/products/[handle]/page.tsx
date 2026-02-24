@@ -2,6 +2,7 @@ import Link from "next/link";
 import { productByHandle, allProducts } from "@/lib/catalog";
 import { discountPercent, formatVND } from "@/lib/money";
 import ImageSlider from "@/components/ImageSlider";
+import ProductVariants from "@/components/ProductVariants";
 
 export function generateStaticParams() {
   return allProducts().map((p) => ({ handle: p.handle }));
@@ -58,7 +59,7 @@ export default function ProductPage({
             }
 
             return (
-              <div >
+              <div>
                 <ImageSlider
                   images={images}
                   altBase={p.title}
@@ -71,41 +72,24 @@ export default function ProductPage({
 
         <div>
           <h1 className="text-3xl font-semibold leading-tight">{p.title}</h1>
-          <div className="mt-6 rounded-2xl border bg-white p-5">
-            <div className="text-sm font-semibold">Tùy chọn</div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {["30ml", "48g", "142g", "500g"].map((v) => (
-                <button
-                  key={v}
-                  className="rounded-xl border px-4 py-2 text-sm hover:bg-zinc-50"
-                >
-                  {v}
-                </button>
-              ))}
-            </div>
-            <div className="mt-4 text-sm opacity-70">
-              Mua thêm 500.000đ để được miễn phí giao hàng trên toàn quốc (mô
-              phỏng).
-            </div>
 
-            <div className="mt-5 flex gap-3"></div>
-          </div>
-
-          <div className="mt-6 grid gap-3 text-sm">
-            <div className="rounded-2xl border p-4">
-              <div className="font-semibold">Mô tả</div>
-              <div className="mt-2 opacity-75">
-                Đây là trang chi tiết sản phẩm dạng tĩnh. Bạn có thể thêm 3–4
-                style layout khác nhau nếu cần (grid/gallery/accordion…).
+          {p.variants && p.variants.length > 0 ? (
+            <ProductVariants variants={p.variants} />
+          ) : (
+            <div className="mt-6 rounded-2xl border bg-white p-5">
+              <div className="text-sm font-semibold">Tùy chọn</div>
+              <div className="mt-3 text-sm opacity-70">
+                Sản phẩm hiện chưa có tùy chọn.
               </div>
             </div>
-            <div className="rounded-2xl border p-4">
-              <div className="font-semibold">Chính sách</div>
-              <div className="mt-2 opacity-75">
-                Đổi trả, vận chuyển, bảo hành (demo).
-              </div>
+          )}
+
+          {p.description && (
+            <div className="mt-6 rounded-2xl border bg-white p-6 text-sm leading-7">
+              <div className="font-semibold mb-2">Mô tả</div>
+              <div className="opacity-80">{p.description}</div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </main>
