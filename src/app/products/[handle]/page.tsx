@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { productByHandle, allProducts } from "@/lib/catalog";
 import { discountPercent, formatVND } from "@/lib/money";
+import ImageSlider from "@/components/ImageSlider";
 
 export function generateStaticParams() {
   return allProducts().map((p) => ({ handle: p.handle }));
@@ -20,8 +21,6 @@ export default function ProductPage({
     );
   }
 
-  const off = discountPercent(p.price, p.compareAtPrice);
-
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <div className="text-sm opacity-70">
@@ -36,45 +35,44 @@ export default function ProductPage({
       </div>
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
-        <div className="rounded-3xl border bg-gradient-to-br from-zinc-100 to-white p-6 shadow-soft">
-          {/* <div className="flex items-start justify-between">
-            <div className="text-xs uppercase tracking-widest text-rose-600">{p.brand}</div>
-            {off > 0 ? (
-              <div className="rounded-xl bg-rose-500 px-3 py-2 text-xs font-semibold text-white">Tiết kiệm {off}%</div>
-            ) : null}
-          </div> */}
-          <div className="mt-6 h-80 rounded-2xl bg-gradient-to-br from-rose-200 to-white" />
-          <div className="mt-4 grid grid-cols-4 gap-3">
-            {p.images && p.images.length > 0
-              ? p.images.slice(0, 4).map((img, i) => (
-                  <div
-                    key={i}
-                    className="h-16 rounded-xl border overflow-hidden bg-white"
-                  >
-                    <img
-                      src={img}
-                      alt={`${p.title} ${i + 1}`}
-                      className="h-full w-full object-cover"
-                    />
+        <div className="rounded-3xl border bg-gradient-to-br from-zinc-100 to-white shadow-soft">
+          {(() => {
+            const images = (p.images || []).filter(
+              (x) => (x || "").trim().length > 0,
+            );
+
+            if (images.length === 0) {
+              return (
+                <>
+                  <div className="mt-6 h-80 rounded-2xl bg-gradient-to-br from-rose-200 to-white" />
+                  <div className="mt-4 grid grid-cols-4 gap-3">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className="h-16 rounded-xl bg-white border"
+                      />
+                    ))}
                   </div>
-                ))
-              : [0, 1, 2, 3].map((i) => (
-                  <div key={i} className="h-16 rounded-xl bg-white border" />
-                ))}
-          </div>
+                </>
+              );
+            }
+
+            return (
+              <div >
+                <ImageSlider
+                  images={images}
+                  altBase={p.title}
+                  youtubeUrl={p.youtubeUrl}
+                />
+              </div>
+            );
+          })()}
         </div>
 
         <div>
           <h1 className="text-3xl font-semibold leading-tight">{p.title}</h1>
-          {/* <div className="mt-3 flex items-baseline gap-3">
-            <div className="text-2xl font-semibold text-rose-600">{formatVND(p.price)}</div>
-            {p.compareAtPrice ? (
-              <div className="text-sm line-through opacity-50">{formatVND(p.compareAtPrice)}</div>
-            ) : null}
-          </div> */}
-
           <div className="mt-6 rounded-2xl border bg-white p-5">
-            <div className="text-sm font-semibold">Tùy chọn (demo)</div>
+            <div className="text-sm font-semibold">Tùy chọn</div>
             <div className="mt-3 flex flex-wrap gap-2">
               {["30ml", "48g", "142g", "500g"].map((v) => (
                 <button
@@ -90,10 +88,7 @@ export default function ProductPage({
               phỏng).
             </div>
 
-            <div className="mt-5 flex gap-3">
-              {/* <button className="flex-1 rounded-xl bg-zinc-900 px-4 py-3 text-white">Thêm vào giỏ</button> */}
-              {/* <button className="flex-1 rounded-xl border px-4 py-3">Tư vấn</button> */}
-            </div>
+            <div className="mt-5 flex gap-3"></div>
           </div>
 
           <div className="mt-6 grid gap-3 text-sm">
