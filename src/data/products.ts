@@ -1,6 +1,5 @@
-import { UnifiedProduct } from "./unifiedProduct";
 
-export type Product = UnifiedProduct;
+import { UnifiedProduct } from "./unifiedProduct";
 
 // export type Product = {
 //   id: string;
@@ -26,27 +25,9 @@ export const PRODUCTS: UnifiedProduct[] = [
     price: 1881000,
     compareAtPrice: 2200000,
     imageHint: "purple",
-    description:"Đây là mô tả",
     isBest: true,
     currency: "VND",
-    stockStatus: "in_stock",
-    images: [
-      "https://ower.s3.ap-southeast-1.amazonaws.com/linhkiendiy/boost-buck-xl6009-lm2577-1.jpg?AWSAccessKeyId=AKIAWYTKPUQQQYECZMZG&Expires=2084714619&Signature=6UBOE%2BelpDLjxIwyD3wLXHgojNU%3D",
-      "https://ower.s3.ap-southeast-1.amazonaws.com/linhkiendiy/boost-buck-xl6009-lm2577-2.jpg?AWSAccessKeyId=AKIAWYTKPUQQQYECZMZG&Expires=2084714698&Signature=DDFYp8i9Cl4HzONy0ehBlerJdWg%3D",
-      "https://ower.s3.ap-southeast-1.amazonaws.com/linhkiendiy/boost-buck-xl6009-lm2577-3.jpg?AWSAccessKeyId=AKIAWYTKPUQQQYECZMZG&Expires=2084714728&Signature=ZnKcD8t2aBLrWtav%2FWAsNyN39CA%3D",
-    ],
-    marketplaces: [
-      {
-        platform: "shopee",
-        productUrl: "https://vn.shp.ee/CqoAAUF",
-      },
-    ],
-    youtubeUrl: "https://youtu.be/LaBiz1TeT58?si=Emu125TNMQyPHGHJ",
-    variants: [
-      { id: "v30", label: "30ml" },
-      { id: "v50", label: "50ml", price: 1990000 },
-      { id: "v100", label: "100ml", stockStatus: "out_of_stock" },
-    ],
+    stockStatus: "in_stock"
   },
   {
     id: "p002",
@@ -60,7 +41,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     isBest: true,
     flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
     currency: "VND",
-    stockStatus: "in_stock",
+    stockStatus: "in_stock"
   },
   {
     id: "p003",
@@ -74,7 +55,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     isHot: true,
     flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
     stockStatus: "in_stock",
-    currency: "VND",
+    currency: "VND"
   },
   {
     id: "p004",
@@ -88,7 +69,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     isBest: true,
     flashSaleEndsAtISO: "2026-03-01T18:00:00+07:00",
     stockStatus: "in_stock",
-    currency: "VND",
+    currency: "VND"
   },
   {
     id: "p005",
@@ -101,7 +82,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     imageHint: "rose",
     isHot: true,
     stockStatus: "in_stock",
-    currency: "VND",
+    currency: "VND"
   },
   {
     id: "p006",
@@ -113,7 +94,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     compareAtPrice: 2150000,
     imageHint: "mint",
     stockStatus: "in_stock",
-    currency: "VND",
+    currency: "VND"
   },
   {
     id: "p007",
@@ -125,7 +106,7 @@ export const PRODUCTS: UnifiedProduct[] = [
     compareAtPrice: 3705000,
     imageHint: "slate",
     stockStatus: "in_stock",
-    currency: "VND",
+    currency: "VND"
   },
   {
     id: "p008",
@@ -138,6 +119,6 @@ export const PRODUCTS: UnifiedProduct[] = [
     imageHint: "amber",
     isBest: true,
     stockStatus: "in_stock",
-    currency: "VND",
-  },
+    currency: "VND"
+  }
 ];

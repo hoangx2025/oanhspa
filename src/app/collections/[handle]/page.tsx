@@ -1,5 +1,14 @@
-import { allProducts, bestSellers, flashSaleProducts, hotWeek } from "@/lib/catalog";
+import { allProducts, bestSellers, flashSaleProducts } from "@/lib/catalog";
 import ProductGrid from "@/components/ProductGrid";
+
+export function generateStaticParams() {
+  return [
+    { handle: "all" },
+    { handle: "my-pham" },
+    { handle: "san-pham-ban-chay" },
+    { handle: "flash-sale" },
+  ];
+}
 
 function titleFromHandle(handle: string) {
   switch (handle) {
@@ -11,19 +20,19 @@ function titleFromHandle(handle: string) {
   }
 }
 
-function productsFromHandle(handle: string) {
+async function productsFromHandle(handle: string) {
   switch (handle) {
-    case "san-pham-ban-chay": return bestSellers();
-    case "flash-sale": return flashSaleProducts();
-    case "my-pham": return allProducts(); // demo
-    case "all": return allProducts();
-    default: return allProducts();
+    case "san-pham-ban-chay": return await bestSellers();
+    case "flash-sale": return await flashSaleProducts();
+    case "my-pham": return await allProducts();
+    case "all": return await allProducts();
+    default: return await allProducts();
   }
 }
 
-export default function CollectionPage({ params }: { params: { handle: string } }) {
+export default async function CollectionPage({ params }: { params: { handle: string } }) {
   const title = titleFromHandle(params.handle);
-  const products = productsFromHandle(params.handle);
+  const products = await productsFromHandle(params.handle);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  tagline     String?
+  heroNote    String?
+  heroImage   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  products    Product[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id                Int      @id @default(autoincrement())
+  handle            String   @unique
+  title             String
+  short             String?
+  description       String?
+  price             Int
+  compareAtPrice    Int?
+  imageHint         String?
+  isHot             Boolean  @default(false)
+  isBest            Boolean  @default(false)
+  flashSaleEndsAt   DateTime?
+  imagesJson        String   @default("[]")
+  youtubeUrl        String?
+
+  brandId           Int
+  brand             Brand    @relation(fields: [brandId], references: [id])
+
+  categoryId        Int
+  category          Category @relation(fields: [categoryId], references: [id])
+
+  variants          Variant[]
+  marketplaces      MarketplaceLink[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([brandId])
+  @@index([categoryId])
+}
+
+model Variant {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  name        String
+  value       String
+  price       Int?
+  compareAt   Int?
+  sku         String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+model MarketplaceLink {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  platform  String
+  productUrl String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}

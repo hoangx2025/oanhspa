@@ -1,19 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import { allProducts } from "@/lib/catalog";
+import { useEffect, useState } from "react";
 
 export default function Header() {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
 
-  const results = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return [];
-    return allProducts()
-      .filter(p => p.title.toLowerCase().includes(s))
-      .slice(0, 6);
+  const [results, setResults] = useState<{ handle: string; title: string }[]>([]);
+
+  useEffect(() => {
+    const query = q.trim();
+    if (!query) {
+      setResults([]);
+      return;
+    }
+    const t = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query)}`)
+        .then((r) => r.json())
+        .then((d) => setResults(d.products || []))
+        .catch(() => setResults([]));
+    }, 180);
+    return () => clearTimeout(t);
   }, [q]);
 
   return (
@@ -53,9 +61,9 @@ export default function Header() {
 
           {open && results.length > 0 && (
             <div className="absolute mt-2 w-full rounded-2xl border bg-white shadow-soft overflow-hidden">
-              {results.map(p => (
+              {results.map((p) => (
                 <Link
-                  key={p.id}
+                  key={p.handle}
                   href={`/products/${p.handle}`}
                   className="block px-4 py-3 text-sm hover:bg-zinc-50"
                 >

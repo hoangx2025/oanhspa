@@ -1,19 +1,18 @@
 import Link from "next/link";
-import { productByHandle, allProducts } from "@/lib/catalog";
-import { discountPercent, formatVND } from "@/lib/money";
 import ImageSlider from "@/components/ImageSlider";
 import ProductVariants from "@/components/ProductVariants";
+import MarketplaceButtons from "@/components/MarketplaceButtons";
+import { allProducts, productByHandle } from "@/lib/catalog";
+import MarketplaceLinks from "@/components/marketplaceLinks";
 
-export function generateStaticParams() {
-  return allProducts().map((p) => ({ handle: p.handle }));
+export async function generateStaticParams() {
+  const items = await allProducts();
+  return items.map((p) => ({ handle: p.handle }));
 }
 
-export default function ProductPage({
-  params,
-}: {
-  params: { handle: string };
-}) {
-  const p = productByHandle(params.handle);
+export default async function ProductPage({ params }: { params: { handle: string } }) {
+  const p = await productByHandle(params.handle);
+
   if (!p) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-10">
@@ -21,6 +20,8 @@ export default function ProductPage({
       </main>
     );
   }
+
+  const images = (p.images || []).filter((x) => (x || "").trim().length > 0);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -36,41 +37,19 @@ export default function ProductPage({
       </div>
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
-        <div className="rounded-3xl border bg-gradient-to-br from-zinc-100 to-white shadow-soft">
-          {(() => {
-            const images = (p.images || []).filter(
-              (x) => (x || "").trim().length > 0,
-            );
+        {/* LEFT */}
+        <div className="rounded-3xl border bg-white shadow-soft overflow-hidden">
+          {images.length > 0 ? (
+            <ImageSlider images={images} altBase={p.title} youtubeUrl={p.youtubeUrl} fit="cover" />
+          ) : (
+            <div className="h-[520px] bg-gradient-to-br from-zinc-100 to-white" />
+          )}
 
-            if (images.length === 0) {
-              return (
-                <>
-                  <div className="mt-6 h-80 rounded-2xl bg-gradient-to-br from-rose-200 to-white" />
-                  <div className="mt-4 grid grid-cols-4 gap-3">
-                    {[0, 1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="h-16 rounded-xl bg-white border"
-                      />
-                    ))}
-                  </div>
-                </>
-              );
-            }
-
-            return (
-              <div>
-                <ImageSlider
-                  images={images}
-                  altBase={p.title}
-                  youtubeUrl={p.youtubeUrl}
-                />
-              </div>
-            );
-          })()}
+          {p.marketplaces && <MarketplaceLinks links={p.marketplaces} />}
         </div>
 
-        <div>
+        {/* RIGHT */}
+        <div className="flex flex-col">
           <h1 className="text-3xl font-semibold leading-tight">{p.title}</h1>
 
           {p.variants && p.variants.length > 0 ? (
@@ -78,18 +57,19 @@ export default function ProductPage({
           ) : (
             <div className="mt-6 rounded-2xl border bg-white p-5">
               <div className="text-sm font-semibold">Tùy chọn</div>
-              <div className="mt-3 text-sm opacity-70">
-                Sản phẩm hiện chưa có tùy chọn.
-              </div>
+              <div className="mt-3 text-sm opacity-70">Sản phẩm hiện chưa có tùy chọn.</div>
             </div>
           )}
 
-          {p.description && (
-            <div className="mt-6 rounded-2xl border bg-white p-6 text-sm leading-7">
-              <div className="font-semibold mb-2">Mô tả</div>
-              <div className="opacity-80">{p.description}</div>
+          {/* <MarketplaceButtons marketplaces={p.marketplaces || []} /> */}
+
+          {/* Description (chiếm luôn phần "Chính sách" bỏ đi + tối thiểu cao cho cân xứng) */}
+          <div className="mt-6 rounded-2xl border bg-white p-5 flex-1 min-h-[260px] md:min-h-[420px]">
+            <div className="font-semibold">Mô tả</div>
+            <div className="mt-2 whitespace-pre-line text-sm opacity-75">
+              {p.description || p.short || "Chưa có mô tả."}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </main>

@@ -3,56 +3,65 @@
 import { useMemo, useState } from "react";
 import type { ProductVariant } from "@/data/unifiedProduct";
 
-export default function ProductVariants({
-  variants,
-}: {
-  variants: ProductVariant[];
-}) {
-  const safe = useMemo(
-    () => variants.filter(v => (v.label || "").trim().length > 0),
-    [variants]
-  );
+export default function ProductVariants({ variants }: { variants: ProductVariant[] }) {
+  const groups = useMemo(() => {
+    const m = new Map<string, ProductVariant[]>();
+    for (const v of variants) {
+      const key = v.name || "Tùy chọn";
+      m.set(key, [...(m.get(key) || []), v]);
+    }
+    return Array.from(m.entries()).map(([name, items]) => ({
+      name,
+      items: items.sort((a, b) => String(a.value).localeCompare(String(b.value))),
+    }));
+  }, [variants]);
 
-  const [selectedId, setSelectedId] = useState(safe[0]?.id);
+  const [selected, setSelected] = useState<Record<string, string>>(() => {
+    const init: Record<string, string> = {};
+    for (const g of groups) init[g.name] = g.items[0]?.value ?? "";
+    return init;
+  });
 
-  const selected = safe.find(v => v.id === selectedId);
+  const pickedText = useMemo(() => {
+    const parts = Object.entries(selected)
+      .filter(([, v]) => v)
+      .map(([, v]) => v);
+    return parts.join(" · ");
+  }, [selected]);
 
   return (
     <div className="mt-6 rounded-2xl border bg-white p-5">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-semibold">Tùy chọn</div>
-        {selected?.label ? (
-          <div className="text-xs opacity-70">Đang chọn: {selected.label}</div>
-        ) : null}
+        <div className="text-xs opacity-70">Đang chọn: {pickedText || "-"}</div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {safe.map((v) => {
-          const disabled = v.stockStatus === "out_of_stock";
-          const active = v.id === selectedId;
-
-          return (
-            <button
-              key={v.id}
-              type="button"
-              disabled={disabled}
-              onClick={() => setSelectedId(v.id)}
-              className={[
-                "rounded-xl border px-2 py-1 transition",
-                disabled ? "opacity-40 cursor-not-allowed" : "hover:bg-zinc-50",
-                active ? "bg-zinc-900 text-white border-zinc-900" : "bg-white",
-              ].join(" ")}
-              title={disabled ? "Hết hàng" : v.label}
-            >
-              {v.label}
-            </button>
-          );
-        })}
+      <div className="mt-4 grid gap-4">
+        {groups.map((g) => (
+          <div key={g.name}>
+            <div className="text-xs font-semibold opacity-70">{g.name}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {g.items.map((v) => {
+                const active = selected[g.name] === v.value;
+                return (
+                  <button
+                    key={`${g.name}-${v.value}`}
+                    type="button"
+                    onClick={() => setSelected((s) => ({ ...s, [g.name]: v.value }))}
+                    className={`rounded-xl border px-4 py-2 text-sm transition ${
+                      active ? "bg-zinc-900 text-white border-zinc-900" : "hover:bg-zinc-50"
+                    }`}
+                  >
+                    {v.value}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* <div className="mt-4 text-sm opacity-70">
-        Mua thêm 500.000đ để được miễn phí giao hàng trên toàn quốc (mô phỏng).
-      </div> */}
+      <div className="mt-4 text-sm opacity-70">Mua thêm 500.000đ để được miễn phí giao hàng trên toàn quốc (mô phỏng).</div>
     </div>
   );
 }

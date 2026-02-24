@@ -7,8 +7,8 @@ import dynamic from "next/dynamic";
 
 const Countdown = dynamic(() => import("@/components/Countdown"), { ssr: false });
 
-export default function FlashSale() {
-  const products = flashSaleProducts();
+export default async function FlashSale() {
+  const products = await flashSaleProducts();
   const endsAtISO = products[0]?.flashSaleEndsAtISO;
 
   return (
@@ -31,7 +31,7 @@ export default function FlashSale() {
       <ProductGrid products={products.slice(0, 4)} />
 
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm opacity-70">* Dữ liệu sản phẩm fix cứng trong file .ts</div>
+        <div className="text-sm opacity-70">* Dữ liệu đang lấy từ database (SQLite demo / MySQL prod)</div>
         <Link href="/collections/flash-sale" className="rounded-xl bg-zinc-900 px-4 py-3 text-sm text-white">
           Xem toàn bộ sản phẩm Flash Sale
         </Link>

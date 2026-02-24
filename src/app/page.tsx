@@ -2,9 +2,16 @@ import Link from "next/link";
 import FlashSale from "@/components/FlashSale";
 import ProductGrid from "@/components/ProductGrid";
 import Tabs from "@/components/Tabs";
-import { bestSellers, hotWeek, productsByCategory } from "@/lib/catalog";
+import BrandShowcase from "@/components/BrandShowcase";
+import { brands, hotWeek, productsByCategory } from "@/lib/catalog";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const brandList = await brands();
+  const hot = await hotWeek();
+  const skincare = await productsByCategory("Skincare");
+  const collagen = await productsByCategory("Bổ sung Collagen");
+  const antiaging = await productsByCategory("Chống lão hóa");
+
   return (
     <main>
       {/* Hero */}
@@ -24,16 +31,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-3xl border bg-white p-6 shadow-soft">
-            <div className="text-sm font-semibold">Thương hiệu</div>
-            <div className="mt-4 grid grid-cols-3 gap-3 text-center text-xs opacity-80">
-              {["IMAGE", "The MAX", "VITAL C", "MD", "BODY SPA", "PREVENTION+"].map(b => (
-                <div key={b} className="rounded-2xl border bg-zinc-50 px-3 py-4">{b}</div>
-              ))}
-            </div>
-
-            <div className="mt-6 rounded-2xl bg-gradient-to-br from-rose-200 to-white h-40" />
-          </div>
+          <BrandShowcase brands={brandList} />
         </div>
       </section>
 
@@ -48,7 +46,7 @@ export default function HomePage() {
             </div>
             <Link className="text-sm hover:text-rose-600" href="/collections/all">Xem tất cả →</Link>
           </div>
-          <ProductGrid products={hotWeek()} />
+          <ProductGrid products={hot} />
         </section>
 
         {/* Flash sale */}
@@ -68,9 +66,9 @@ export default function HomePage() {
           <div className="mt-5">
             <Tabs
               items={[
-                { key: "skincare", label: "Skincare", content: <ProductGrid products={productsByCategory("Skincare")} /> },
-                { key: "collagen", label: "Bổ sung Collagen", content: <ProductGrid products={productsByCategory("Bổ sung Collagen")} /> },
-                { key: "antiaging", label: "Chống lão hóa", content: <ProductGrid products={productsByCategory("Chống lão hóa")} /> }
+                { key: "skincare", label: "Skincare", content: <ProductGrid products={skincare} /> },
+                { key: "collagen", label: "Bổ sung Collagen", content: <ProductGrid products={collagen} /> },
+                { key: "antiaging", label: "Chống lão hóa", content: <ProductGrid products={antiaging} /> }
               ]}
             />
           </div>

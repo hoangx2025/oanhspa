@@ -1,24 +1,21 @@
-// utils/youtube.ts
-export function extractYoutubeId(url?: string) {
+export function extractYoutubeId(url?: string): string | null {
   if (!url) return null;
-
-  const u = url.trim();
-
-  // watch?v=ID
-  let match = u.match(/[?&]v=([^&]+)/);
-  if (match?.[1]) return match[1];
-
-  // youtu.be/ID
-  match = u.match(/youtu\.be\/([^?&]+)/);
-  if (match?.[1]) return match[1];
-
-  // youtube.com/shorts/ID (kể cả ?feature=share)
-  match = u.match(/youtube\.com\/shorts\/([^?&]+)/);
-  if (match?.[1]) return match[1];
-
-  // youtube.com/embed/ID
-  match = u.match(/youtube\.com\/embed\/([^?&]+)/);
-  if (match?.[1]) return match[1];
-
-  return null;
+  try {
+    const u = new URL(url);
+    // youtu.be/<id>
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.split("/").filter(Boolean)[0];
+      return id || null;
+    }
+    // youtube.com/watch?v=<id>
+    const v = u.searchParams.get("v");
+    if (v) return v;
+    // youtube.com/embed/<id>
+    const parts = u.pathname.split("/").filter(Boolean);
+    const embedIdx = parts.indexOf("embed");
+    if (embedIdx >= 0 && parts[embedIdx + 1]) return parts[embedIdx + 1];
+    return null;
+  } catch {
+    return null;
+  }
 }

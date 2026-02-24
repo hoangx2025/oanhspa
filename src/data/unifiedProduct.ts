@@ -10,15 +10,6 @@ export type ProductSpecification = {
 
 export type Category = "Skincare" | "Bổ sung Collagen" | "Chống lão hóa";
 
-export type ProductVariant = {
-  id: string;          // unique trong product
-  label: string;       // ví dụ "30ml", "50ml"
-  price?: number;      // nếu biến thể có giá riêng
-  compareAtPrice?: number;
-  stockStatus?: StockStatus
-};
-
-
 export type UnifiedProduct = {
   // Identity
   id: string;
@@ -59,6 +50,16 @@ export type UnifiedProduct = {
   // Marketplace / voucher
   marketplaces?: MarketplaceLink[];
 
-  imageHint?: "purple" | "amber" | "mint" | "rose" | "slate";
+  // Variants (VD: dung tích, màu, size...)
   variants?: ProductVariant[];
+
+  imageHint?: "purple" | "amber" | "mint" | "rose" | "slate";
+};
+
+export type ProductVariant = {
+  name: string; // VD: "Dung tích"
+  value: string; // VD: "30ml"
+  price?: number; // nếu mỗi biến thể có giá riêng
+  compareAtPrice?: number;
+  sku?: string;
 };
