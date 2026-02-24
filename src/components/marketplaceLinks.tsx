@@ -1,23 +1,25 @@
 import { MARKETPLACE_META } from "./marketplaces";
 import { MarketplaceLink } from "../data/marketplaceLink";
-export default function MarketplaceLinks({
-  links,
-}: {
-  links: MarketplaceLink[];
-}) {
+import VoucherSection from "./VoucherSection";
+
+export default function MarketplaceLinks({ links, productTitle }: { links: MarketplaceLink[]; productTitle?: string }) {
   if (!links?.length) return null;
 
-  return (
-    <div className="border-t bg-white p-4">
-      <h2 className="text-sm font-semibold">Mua ngay tại</h2>
+  const shopeeLink = links.find((l) => l.platform === "shopee");
+  const shopeeUrl = shopeeLink?.affiliateUrl || shopeeLink?.productUrl;
 
-      <div className="mt-3 flex flex-wrap items-center gap-4">
+  return (
+    <div className="border-t bg-white px-4 pt-4 pb-5">
+      <div className="text-sm font-semibold">Mua ngay tại</div>
+
+      
+
+      {/* Logo các sàn */}
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         {links.map((item) => {
           const meta = MARKETPLACE_META[item.platform];
           if (!meta) return null;
-
           const url = item.affiliateUrl || item.productUrl || process.env.NEXT_PUBLIC_SHOPEE_HOME_PAGE;
-
           return (
             <a
               key={item.platform}
@@ -25,18 +27,25 @@ export default function MarketplaceLinks({
               target="_blank"
               rel="nofollow sponsored noopener"
               title={`Mua trên ${meta.name}`}
-              className="flex h-9 items-center justify-center rounded-xl border bg-white px-3 hover:bg-zinc-50"
+              className="flex h-9 items-center justify-center rounded-xl border bg-white px-3 hover:bg-zinc-50 transition"
             >
-              <img
-                src={meta.icon}
-                alt={meta.name}
-                height={35}
-                className="h-7 w-auto object-contain"
-              />
+              <img src={meta.icon} alt={meta.name} height={35} className="h-7 w-auto object-contain" />
             </a>
           );
         })}
       </div>
+
+      {/* Note: giá sàn đắt hơn */}
+      <p className="mt-1.5 text-xs leading-relaxed opacity-70">
+        Giá mua qua sàn thường cao hơn{" "}
+        <span className="font-semibold text-zinc-900">10–20%</span> do phí nền tảng &amp; vận hành.{" "}
+        <span className="font-medium text-rose-600">
+          Nên mua trực tiếp tại cửa hàng để được giá tốt nhất.
+        </span>
+      </p>
+
+      {/* Voucher */}
+      <VoucherSection shopeeUrl={shopeeUrl} productTitle={productTitle} />
     </div>
   );
 }

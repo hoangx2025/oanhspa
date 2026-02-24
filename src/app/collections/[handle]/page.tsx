@@ -1,5 +1,5 @@
-import { allProducts, bestSellers, flashSaleProducts } from "@/lib/catalog";
-import ProductGrid from "@/components/ProductGrid";
+import { allProducts, bestSellers, flashSaleProducts, brands, productsByBrandSlug } from "@/lib/catalog";
+import PaginatedProductGrid from "@/components/PaginatedProductGrid";
 
 export function generateStaticParams() {
   return [
@@ -24,24 +24,54 @@ async function productsFromHandle(handle: string) {
   switch (handle) {
     case "san-pham-ban-chay": return await bestSellers();
     case "flash-sale": return await flashSaleProducts();
-    case "my-pham": return await allProducts();
-    case "all": return await allProducts();
     default: return await allProducts();
   }
 }
 
-export default async function CollectionPage({ params }: { params: { handle: string } }) {
-  const title = titleFromHandle(params.handle);
-  const products = await productsFromHandle(params.handle);
+export default async function CollectionPage({
+  params,
+  searchParams,
+}: {
+  params: { handle: string };
+  searchParams?: { brand?: string; page?: string };
+}) {
+  const brandSlug = searchParams?.brand;
+  const currentPage = Math.max(1, Number(searchParams?.page || "1"));
+
+  let title = titleFromHandle(params.handle);
+  let products;
+
+  if (brandSlug) {
+    const brandList = await brands();
+    const matchedBrand = brandList.find((b) => b.slug === brandSlug);
+    if (matchedBrand) title = matchedBrand.name;
+    products = await productsByBrandSlug(brandSlug, 100);
+  } else {
+    products = await productsFromHandle(params.handle);
+  }
+
+  // baseUrl không chứa ?page= để PaginatedProductGrid tự append
+  const baseUrl = brandSlug
+    ? `/collections/${params.handle}?brand=${brandSlug}`
+    : `/collections/${params.handle}`;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
       <div className="rounded-3xl border bg-gradient-to-br from-rose-50 to-white p-6 md:p-8 shadow-soft">
-        <div className="text-xs uppercase tracking-widest text-rose-600">Collections</div>
+        <div className="text-xs uppercase tracking-widest text-rose-600">
+          {brandSlug ? "Thương hiệu" : "Collections"}
+        </div>
         <h1 className="mt-2 text-3xl font-semibold">{title}</h1>
-        <p className="mt-2 text-sm opacity-70">Trang nhóm sản phẩm (mô phỏng). Có thể mở rộng filter/sort sau.</p>
+        {!brandSlug && (
+          <p className="mt-2 text-sm opacity-70">Trang nhóm sản phẩm. Có thể mở rộng filter/sort sau.</p>
+        )}
       </div>
-      <ProductGrid products={products} />
+
+      <PaginatedProductGrid
+        products={products}
+        currentPage={currentPage}
+        baseUrl={baseUrl}
+      />
     </main>
   );
 }
