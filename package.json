@@ -14,9 +14,12 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.996.0",
     "@aws-sdk/s3-request-presigner": "^3.996.0",
+    "@libsql/client": "^0.17.0",
+    "@prisma/adapter-libsql": "^6.19.2",
     "@prisma/client": "^6.4.1",
     "@types/qrcode": "^1.5.6",
     "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.6.2",
     "next": "14.2.5",
     "next-auth": "^4.24.13",
     "otplib": "^13.3.0",
