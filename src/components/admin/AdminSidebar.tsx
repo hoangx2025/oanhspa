@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/units", label: "Đơn vị" },
   { href: "/admin/users", label: "Người dùng" },
   { href: "/admin/settings/s3", label: "Cấu hình S3" },
+  { href: "/admin/settings/mfa", label: "Bảo mật (MFA)" },
 ];
 
 export default function AdminSidebar() {
