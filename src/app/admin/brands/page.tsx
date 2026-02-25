@@ -20,6 +20,7 @@ export default async function AdminBrandsPage() {
         <table className="w-full text-sm">
           <thead className="bg-zinc-50 border-b">
             <tr>
+              <th className="w-14 px-4 py-3"></th>
               <th className="text-left px-4 py-3 font-medium text-zinc-600">Tên</th>
               <th className="text-left px-4 py-3 font-medium text-zinc-600">Slug</th>
               <th className="text-left px-4 py-3 font-medium text-zinc-600">Sản phẩm</th>
@@ -29,6 +30,13 @@ export default async function AdminBrandsPage() {
           <tbody className="divide-y">
             {brands.map((b) => (
               <tr key={b.id} className="hover:bg-zinc-50">
+                <td className="px-4 py-2">
+                  {b.heroImage ? (
+                    <img src={b.heroImage} alt={b.name} className="w-20 h-20 rounded-xl object-cover border bg-zinc-100" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl border bg-zinc-100" />
+                  )}
+                </td>
                 <td className="px-4 py-3 font-medium">{b.name}</td>
                 <td className="px-4 py-3 text-zinc-500">{b.slug}</td>
                 <td className="px-4 py-3 text-zinc-500">{b._count.products}</td>
@@ -41,7 +49,7 @@ export default async function AdminBrandsPage() {
               </tr>
             ))}
             {brands.length === 0 && (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400">Chưa có thương hiệu.</td></tr>
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-400">Chưa có thương hiệu.</td></tr>
             )}
           </tbody>
         </table>

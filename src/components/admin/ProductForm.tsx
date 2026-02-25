@@ -13,6 +13,7 @@ type Marketplace = { platform: string; productUrl: string };
 
 type Brand = { id: number; name: string };
 type Category = { id: number; name: string };
+type Unit = { id: number; name: string };
 
 type ProductData = {
   id?: number;
@@ -26,12 +27,15 @@ type ProductData = {
 interface Props {
   brands: Brand[];
   categories: Category[];
+  units: Unit[];
   initial?: Partial<ProductData> & { id?: number };
 }
 
-export default function ProductForm({ brands, categories, initial }: Props) {
+export default function ProductForm({ brands, categories, units, initial }: Props) {
   const router = useRouter();
   const isEdit = !!initial?.id;
+
+  const defaultUnitName = units[0]?.name ?? "Dung tích";
 
   const [form, setForm] = useState<ProductData>({
     handle: initial?.handle ?? "",
@@ -45,7 +49,7 @@ export default function ProductForm({ brands, categories, initial }: Props) {
     youtubeUrl: initial?.youtubeUrl ?? "",
     brandId: initial?.brandId ?? "",
     categoryId: initial?.categoryId ?? "",
-    variants: initial?.variants ?? [{ name: "Dung tích", value: "", price: "", compareAt: "", stock: 0, sku: "" }],
+    variants: initial?.variants ?? [{ name: defaultUnitName, value: "", price: "", compareAt: "", stock: 0, sku: "" }],
     images: initial?.images ?? [],
     marketplaces: initial?.marketplaces ?? [],
   });
@@ -62,7 +66,7 @@ export default function ProductForm({ brands, categories, initial }: Props) {
   function addVariant() {
     setForm((prev) => ({
       ...prev,
-      variants: [...prev.variants, { name: "Dung tích", value: "", price: "", compareAt: "", stock: 0, sku: "" }],
+      variants: [...prev.variants, { name: defaultUnitName, value: "", price: "", compareAt: "", stock: 0, sku: "" }],
     }));
   }
 
@@ -87,20 +91,30 @@ export default function ProductForm({ brands, categories, initial }: Props) {
       for (const file of Array.from(files)) {
         const presignRes = await fetch(`/api/admin/s3/presign?filename=${encodeURIComponent(file.name)}&mimeType=${encodeURIComponent(file.type)}`);
         if (!presignRes.ok) { alert("Lỗi: Chưa cấu hình S3 hoặc không có S3 config mặc định."); break; }
-        const { uploadUrl, publicUrl } = await presignRes.json();
+        const { uploadUrl, publicUrl, key, presignedGetUrl, presignedExpiry } = await presignRes.json();
 
         await fetch(uploadUrl, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
 
         const fileRes = await fetch("/api/admin/files", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: publicUrl, name: file.name, mimeType: file.type }),
+          body: JSON.stringify({
+            url: publicUrl,
+            key,
+            name: file.name,
+            mimeType: file.type,
+            presignedUrl: presignedGetUrl,
+            presignedExpiry,
+          }),
         });
         const fileRecord = await fileRes.json();
 
+        // Use presigned GET URL for display; fallback to permanent URL
+        const displayUrl = presignedGetUrl || publicUrl;
+
         setForm((prev) => ({
           ...prev,
-          images: [...prev.images, { fileId: fileRecord.id, url: publicUrl, alt: "", sortOrder: prev.images.length }],
+          images: [...prev.images, { fileId: fileRecord.id, url: displayUrl, alt: "", sortOrder: prev.images.length }],
         }));
       }
     } finally {
@@ -240,12 +254,26 @@ export default function ProductForm({ brands, categories, initial }: Props) {
             + Thêm biến thể
           </button>
         </div>
+        {units.length === 0 && (
+          <div className="mb-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-2 text-xs text-amber-700">
+            Chưa có đơn vị nào. <a href="/admin/units/new" className="underline font-medium">Thêm đơn vị</a> trước khi tạo biến thể.
+          </div>
+        )}
         <div className="space-y-3">
           {form.variants.map((v, i) => (
             <div key={i} className="grid grid-cols-2 gap-2 md:grid-cols-6 items-end">
               <div>
-                <label className={labelCls}>Tên</label>
-                <input value={v.name} onChange={(e) => setVariant(i, "name", e.target.value)} className={inputCls} placeholder="Dung tích" />
+                <label className={labelCls}>Đơn vị</label>
+                <select
+                  value={v.name}
+                  onChange={(e) => setVariant(i, "name", e.target.value)}
+                  className={inputCls}
+                >
+                  {units.map((u) => (
+                    <option key={u.id} value={u.name}>{u.name}</option>
+                  ))}
+                  {units.length === 0 && <option value={v.name}>{v.name}</option>}
+                </select>
               </div>
               <div>
                 <label className={labelCls}>Giá trị</label>
@@ -289,17 +317,26 @@ export default function ProductForm({ brands, categories, initial }: Props) {
             <input type="file" accept="image/*" multiple onChange={handleFileChange} disabled={uploading} className="hidden" />
           </label>
         </div>
-        <div className="grid grid-cols-3 gap-3 md:grid-cols-5">
+        <div className="grid grid-cols-4 gap-2 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8">
           {form.images.map((img, i) => (
-            <div key={i} className="relative group">
-              <img src={img.url} alt={img.alt || ""} className="w-full h-24 object-cover rounded-lg border" />
-              <button
-                type="button"
-                onClick={() => removeImage(i)}
-                className="absolute top-1 right-1 rounded-full bg-red-500 text-white w-5 h-5 text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-              >
-                ✕
-              </button>
+            <div key={i} className="relative group flex flex-col gap-1.5">
+              <div className="relative aspect-square overflow-hidden rounded-xl border bg-zinc-50">
+                <img
+                  src={img.url}
+                  alt={img.alt || ""}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(i)}
+                  className="absolute top-1.5 right-1.5 rounded-full bg-red-500 text-white w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center shadow"
+                >
+                  ✕
+                </button>
+                {i === 0 && (
+                  <span className="absolute bottom-1.5 left-1.5 rounded-full bg-zinc-900/70 px-2 py-0.5 text-[10px] text-white">Chính</span>
+                )}
+              </div>
               <input
                 value={img.alt}
                 onChange={(e) => {
@@ -308,12 +345,12 @@ export default function ProductForm({ brands, categories, initial }: Props) {
                   setField("images", images);
                 }}
                 placeholder="Alt text"
-                className="mt-1 w-full text-xs rounded border px-2 py-1 focus:outline-none"
+                className="w-full text-xs rounded-lg border px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-rose-400"
               />
             </div>
           ))}
           {form.images.length === 0 && (
-            <div className="col-span-full text-sm text-zinc-400">Chưa có ảnh. Upload ảnh để bắt đầu.</div>
+            <div className="col-span-full py-8 text-center text-sm text-zinc-400">Chưa có ảnh. Upload ảnh để bắt đầu.</div>
           )}
         </div>
       </div>

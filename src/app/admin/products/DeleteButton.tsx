@@ -5,7 +5,7 @@ import { useState } from "react";
 
 interface Props {
   id: number | string;
-  type: "products" | "brands" | "categories" | "users" | "orders";
+  type: "products" | "brands" | "categories" | "users" | "orders" | "units";
   label?: string;
 }
 

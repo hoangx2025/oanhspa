@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/products", label: "Sản phẩm" },
   { href: "/admin/brands", label: "Thương hiệu" },
   { href: "/admin/categories", label: "Danh mục" },
+  { href: "/admin/units", label: "Đơn vị" },
   { href: "/admin/users", label: "Người dùng" },
   { href: "/admin/settings/s3", label: "Cấu hình S3" },
 ];

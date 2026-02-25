@@ -1,5 +1,7 @@
-import { allProducts, bestSellers, flashSaleProducts, brands, productsByBrandSlug } from "@/lib/catalog";
+import { Suspense } from "react";
+import { categories, productsByFilters, brands } from "@/lib/catalog";
 import PaginatedProductGrid from "@/components/PaginatedProductGrid";
+import CategoryFilter from "@/components/CategoryFilter";
 
 export function generateStaticParams() {
   return [
@@ -20,52 +22,70 @@ function titleFromHandle(handle: string) {
   }
 }
 
-async function productsFromHandle(handle: string) {
-  switch (handle) {
-    case "san-pham-ban-chay": return await bestSellers();
-    case "flash-sale": return await flashSaleProducts();
-    default: return await allProducts();
-  }
-}
-
 export default async function CollectionPage({
   params,
   searchParams,
 }: {
   params: { handle: string };
-  searchParams?: { brand?: string; page?: string };
+  searchParams?: { brand?: string; category?: string; page?: string };
 }) {
   const brandSlug = searchParams?.brand;
+  const categorySlug = searchParams?.category;
   const currentPage = Math.max(1, Number(searchParams?.page || "1"));
 
-  let title = titleFromHandle(params.handle);
-  let products;
+  const [categoryList, products] = await Promise.all([
+    categories(),
+    (async () => {
+      // Xác định bộ lọc cơ bản theo handle
+      const baseOpts: Parameters<typeof productsByFilters>[0] = { limit: 200 };
+      if (params.handle === "san-pham-ban-chay") baseOpts.isBest = true;
+      if (params.handle === "flash-sale") baseOpts.hasFlashSale = true;
 
+      // Áp dụng brand / category filter
+      if (brandSlug) baseOpts.brandSlug = brandSlug;
+      if (categorySlug) baseOpts.categorySlug = categorySlug;
+
+      return productsByFilters(baseOpts);
+    })(),
+  ]);
+
+  // Tiêu đề: ưu tiên brand > category > handle
+  let title = titleFromHandle(params.handle);
   if (brandSlug) {
     const brandList = await brands();
-    const matchedBrand = brandList.find((b) => b.slug === brandSlug);
-    if (matchedBrand) title = matchedBrand.name;
-    products = await productsByBrandSlug(brandSlug, 100);
-  } else {
-    products = await productsFromHandle(params.handle);
+    const matched = brandList.find((b) => b.slug === brandSlug);
+    if (matched) title = matched.name;
+  } else if (categorySlug) {
+    const matched = categoryList.find((c) => c.slug === categorySlug);
+    if (matched) title = matched.name;
   }
 
-  // baseUrl không chứa ?page= để PaginatedProductGrid tự append
-  const baseUrl = brandSlug
-    ? `/collections/${params.handle}?brand=${brandSlug}`
-    : `/collections/${params.handle}`;
+  // baseUrl giữ tất cả filter hiện tại trừ page
+  const baseParams = new URLSearchParams();
+  if (brandSlug) baseParams.set("brand", brandSlug);
+  if (categorySlug) baseParams.set("category", categorySlug);
+  const qs = baseParams.toString();
+  const baseUrl = `/collections/${params.handle}${qs ? `?${qs}` : ""}`;
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <div className="rounded-3xl border bg-gradient-to-br from-rose-50 to-white p-6 md:p-8 shadow-soft">
-        <div className="text-xs uppercase tracking-widest text-rose-600">
-          {brandSlug ? "Thương hiệu" : "Collections"}
-        </div>
-        <h1 className="mt-2 text-3xl font-semibold">{title}</h1>
-        {!brandSlug && (
-          <p className="mt-2 text-sm opacity-70">Trang nhóm sản phẩm. Có thể mở rộng filter/sort sau.</p>
+      <nav className="flex items-center gap-1.5 text-sm text-zinc-400">
+        <a href="/" className="hover:text-rose-600 transition-colors">Trang chủ</a>
+        <span>/</span>
+        {params.handle === "all" && !categorySlug && !brandSlug ? (
+          <span className="text-zinc-700 font-medium">Tất cả sản phẩm</span>
+        ) : (
+          <>
+            <a href="/collections/all" className="hover:text-rose-600 transition-colors">Sản phẩm</a>
+            <span>/</span>
+            <span className="text-zinc-700 font-medium">{title}</span>
+          </>
         )}
-      </div>
+      </nav>
+
+      <Suspense fallback={null}>
+        <CategoryFilter categories={categoryList} />
+      </Suspense>
 
       <PaginatedProductGrid
         products={products}

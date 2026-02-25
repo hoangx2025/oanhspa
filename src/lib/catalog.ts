@@ -1,11 +1,20 @@
 import { prisma } from "@/lib/db";
 import type { UnifiedProduct, ProductVariant } from "@/data/unifiedProduct";
 
+function resolveImageUrl(file: any): string | null {
+  if (!file) return null;
+  // Dùng presigned URL nếu còn hạn
+  if (file.presignedUrl && file.presignedExpiry && new Date(file.presignedExpiry) > new Date()) {
+    return file.presignedUrl;
+  }
+  return file.url ?? null;
+}
+
 function toUnified(p: any): UnifiedProduct {
   const images: string[] = (p.images || [])
     .slice()
     .sort((a: any, b: any) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
-    .map((x: any) => x?.file?.url)
+    .map((x: any) => resolveImageUrl(x?.file))
     .filter((x: any) => typeof x === "string" && x.trim().length > 0);
 
   const variants: ProductVariant[] = (p.variants || []).map((v: any) => ({
@@ -109,6 +118,46 @@ export async function flashSaleProducts(limit = 6): Promise<UnifiedProduct[]> {
 export async function brands(): Promise<{ name: string; slug: string; tagline?: string | null; heroNote?: string | null; heroImage?: string | null }[]> {
   const list = await prisma.brand.findMany({ orderBy: { name: "asc" } });
   return list.map((b) => ({ name: b.name, slug: b.slug, tagline: b.tagline, heroNote: b.heroNote, heroImage: b.heroImage }));
+}
+
+export async function categories(): Promise<{ name: string; slug: string }[]> {
+  const list = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  return list.map((c) => ({ name: c.name, slug: c.slug }));
+}
+
+const PRODUCT_INCLUDE = {
+  brand: true,
+  category: true,
+  images: { include: { file: true }, orderBy: { sortOrder: "asc" } as const },
+  variants: { orderBy: { sortOrder: "asc" } as const },
+  marketplaces: { orderBy: { sortOrder: "asc" } as const },
+} as const;
+
+/** Lấy sản phẩm với bộ lọc tuỳ chọn: brand slug, category slug */
+export async function productsByFilters(opts: {
+  brandSlug?: string;
+  categorySlug?: string;
+  isBest?: boolean;
+  isHot?: boolean;
+  hasFlashSale?: boolean;
+  limit?: number;
+}): Promise<UnifiedProduct[]> {
+  const { brandSlug, categorySlug, isBest, isHot, hasFlashSale, limit = 200 } = opts;
+
+  const where: Record<string, unknown> = {};
+  if (brandSlug) where.brand = { slug: brandSlug };
+  if (categorySlug) where.category = { slug: categorySlug };
+  if (isBest) where.isBest = true;
+  if (isHot) where.isHot = true;
+  if (hasFlashSale) where.flashSaleEndsAt = { not: null };
+
+  const list = await prisma.product.findMany({
+    where,
+    take: limit,
+    include: PRODUCT_INCLUDE,
+    orderBy: [{ isBest: "desc" }, { updatedAt: "desc" }],
+  });
+  return list.map(toUnified);
 }
 
 export async function productsByBrandSlug(brandSlug: string, limit = 6): Promise<UnifiedProduct[]> {

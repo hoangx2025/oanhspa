@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import ProductForm from "@/components/admin/ProductForm";
 
 export default async function EditProductPage({ params }: { params: { id: string } }) {
-  const [product, brands, categories] = await Promise.all([
+  const [product, brands, categories, units] = await Promise.all([
     db.product.findUnique({
       where: { id: Number(params.id) },
       include: {
@@ -14,6 +14,7 @@ export default async function EditProductPage({ params }: { params: { id: string
     }),
     db.brand.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     db.category.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
+    db.unit.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   if (!product) notFound();
@@ -43,7 +44,10 @@ export default async function EditProductPage({ params }: { params: { id: string
     })),
     images: product.images.map((img, i) => ({
       fileId: img.fileId,
-      url: img.file.url,
+      // Use presigned URL if available and not expired, else fall back to stored url
+      url: (img.file.presignedUrl && img.file.presignedExpiry && new Date(img.file.presignedExpiry) > new Date())
+        ? img.file.presignedUrl
+        : img.file.url,
       alt: img.alt ?? "",
       sortOrder: i,
     })),
@@ -56,7 +60,7 @@ export default async function EditProductPage({ params }: { params: { id: string
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-zinc-800 mb-6">Sửa sản phẩm</h1>
-      <ProductForm brands={brands} categories={categories} initial={initial} />
+      <ProductForm brands={brands} categories={categories} units={units} initial={initial} />
     </div>
   );
 }
