@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { authenticator } from "otplib";
+import { verifySync } from "otplib";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -23,12 +23,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Chưa thiết lập MFA" }, { status: 400 });
   }
 
-  const isValid = authenticator.verify({
+  const result = verifySync({
     token: String(code).replace(/\s/g, ""),
     secret: tokenRecord.value,
   });
 
-  if (!isValid) {
+  if (!result.valid) {
     return NextResponse.json({ error: "Mã không đúng hoặc đã hết hạn" }, { status: 400 });
   }
 

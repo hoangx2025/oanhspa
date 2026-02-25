@@ -1,7 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { authenticator } from "otplib";
+import { verifySync } from "otplib";
 import { db } from "@/lib/db";
 
 export const authOptions: NextAuthOptions = {
@@ -45,11 +45,11 @@ export const authOptions: NextAuthOptions = {
 
           if (!tokenRecord?.value) throw new Error("MFA_INVALID");
 
-          const isValid = authenticator.verify({
+          const result = verifySync({
             token: credentials.totp.replace(/\s/g, ""),
             secret: tokenRecord.value,
           });
-          if (!isValid) throw new Error("MFA_INVALID");
+          if (!result.valid) throw new Error("MFA_INVALID");
         }
         // ───────────────────────────────────────────────────────────
 

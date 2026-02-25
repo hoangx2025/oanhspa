@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { authenticator } from "otplib";
+import { generateSecret, generateURI } from "otplib";
 import QRCode from "qrcode";
 
 export async function POST() {
@@ -15,8 +15,8 @@ export async function POST() {
   const email  = session.user.email ?? userId;
 
   // Tạo secret mới
-  const secret = authenticator.generateSecret();
-  const otpauthUrl = authenticator.keyuri(email, "Oanh SPA Admin", secret);
+  const secret = generateSecret();
+  const otpauthUrl = generateURI({ label: email, issuer: "Oanh SPA Admin", secret });
   const qrDataUrl  = await QRCode.toDataURL(otpauthUrl);
 
   // Lưu tạm vào AspNetUserTokens (chưa kích hoạt MFA)

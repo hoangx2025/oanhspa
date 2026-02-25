@@ -8,9 +8,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Header />
       <main className="flex-1">
         {children}
-        <FloatChatButtons />
       </main>
       <Footer />
+      <FloatChatButtons />
     </>
   );
 }

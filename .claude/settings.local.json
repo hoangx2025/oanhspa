@@ -1,9 +1,11 @@
 {
   "permissions": {
     "allow": [
-	  "Bash(*)",
+      "Bash(*)",
       "Edit(*)",
-      "Write(*)"
+      "Write(*)",
+      "WebFetch(domain:zalo.me)",
+      "WebFetch(domain:www.messenger.com)"
     ]
   },
   "autoApprove": true
