@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: { params: { handle: string
           </div>
 
           {/* Mua ngay tại: nằm ngay dưới slider */}
-          {p.marketplaces && <MarketplaceLinks links={p.marketplaces} productTitle={p.title} />}
+          <MarketplaceLinks links={p.marketplaces || []} productTitle={p.title} />
         </div>
 
         {/* RIGHT */}
