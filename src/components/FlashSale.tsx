@@ -31,7 +31,7 @@ export default async function FlashSale() {
       <ProductGrid products={products.slice(0, 4)} />
 
       <div className="mt-6 flex items-center justify-between">
-        <div className="text-sm opacity-70">* Dữ liệu đang lấy từ database (SQLite demo / MySQL prod)</div>
+        <div className="text-sm opacity-70">* Dữ liệu đang lấy từ database (Turso cloud)</div>
         <Link href="/collections/flash-sale" className="rounded-xl bg-zinc-900 px-4 py-3 text-sm text-white">
           Xem toàn bộ sản phẩm Flash Sale
         </Link>
