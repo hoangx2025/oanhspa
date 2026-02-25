@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { extractYoutubeId } from "@/utils/youtube";
 
@@ -56,10 +57,11 @@ export default function ImageSlider({
         onMouseLeave={() => !showVideo && startAuto()}
       >
         {/* IMG luôn tồn tại để giữ layout */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={safeImages[index]}
           alt={`${altBase} - ảnh ${index + 1}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 576px"
           onClick={() => !showVideo && setShowFull(true)}
           style={{
             opacity: showVideo ? 0 : 1,

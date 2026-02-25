@@ -9,10 +9,8 @@ export default function MarketplaceLinks({ links, productTitle }: { links: Marke
   const shopeeUrl = shopeeLink?.affiliateUrl || shopeeLink?.productUrl;
 
   return (
-    <div className="border-t bg-white px-4 pt-4 pb-1">
+    <div className="flex flex-1 flex-col border-t bg-white px-4 pt-4 pb-4">
       <div className="text-sm font-semibold">Mua ngay tại</div>
-
-      
 
       {/* Logo các sàn */}
       <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -44,10 +42,11 @@ export default function MarketplaceLinks({ links, productTitle }: { links: Marke
         </span>
       </p>
 
-      {/* Voucher */}
-
-      <div className="text-sm font-semibold mt-4">Quý khách hàng có thể lấy voucher bên dưới để giảm giá ngay tại cửa hàng</div>
-      <VoucherSection shopeeUrl={shopeeUrl} productTitle={productTitle} />
+      {/* Voucher — đẩy xuống bottom */}
+      <div className="mt-auto pt-4">
+        <div className="text-sm font-semibold">Quý khách hàng có thể lấy voucher bên dưới để giảm giá ngay tại cửa hàng</div>
+        <VoucherSection shopeeUrl={shopeeUrl} productTitle={productTitle} />
+      </div>
     </div>
   );
 }

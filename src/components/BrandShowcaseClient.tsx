@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
@@ -47,16 +48,17 @@ export default function BrandShowcaseClient({ brands }: { brands: Brand[] }) {
         </div>
 
         {/* Ảnh brand — full width, sát đáy card */}
-        <div className="h-44 bg-gradient-to-br from-zinc-100 to-white flex items-center justify-center">
+        <div className="relative h-44 bg-gradient-to-br from-zinc-100 to-white">
           {activeBrand?.heroImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={activeBrand.heroImage}
               alt={activeBrand.name}
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
             />
           ) : (
-            <span className="text-2xl font-semibold opacity-20">{activeBrand?.name}</span>
+            <span className="absolute inset-0 flex items-center justify-center text-2xl font-semibold opacity-20">{activeBrand?.name}</span>
           )}
         </div>
       </div>

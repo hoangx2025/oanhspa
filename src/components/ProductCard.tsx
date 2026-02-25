@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { UnifiedProduct } from "@/data/unifiedProduct";
 
@@ -13,13 +14,15 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
         aria-label={p.title}
       >
         {firstImg ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={firstImg}
-            alt={p.title}
-            className="h-44 w-full object-cover bg-white"
-            loading="lazy"
-          />
+          <div className="relative h-44 bg-white">
+            <Image
+              src={firstImg}
+              alt={p.title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+              className="object-cover"
+            />
+          </div>
         ) : (
           <div className="h-44" />
         )}

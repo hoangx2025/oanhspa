@@ -5,7 +5,8 @@
       "Edit(*)",
       "Write(*)",
       "WebFetch(domain:zalo.me)",
-      "WebFetch(domain:www.messenger.com)"
+      "WebFetch(domain:www.messenger.com)",
+      "mcp__ide__getDiagnostics"
     ]
   },
   "autoApprove": true

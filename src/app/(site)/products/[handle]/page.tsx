@@ -38,7 +38,7 @@ export default async function ProductPage({ params }: { params: { handle: string
 
       <div className="mt-6 grid gap-8 md:grid-cols-2">
         {/* LEFT */}
-        <div className="rounded-xl border bg-white shadow-soft">
+        <div className="flex flex-col rounded-xl border bg-white shadow-soft">
           <div className="overflow-hidden rounded-xl">
             {images.length > 0 ? (
               <ImageSlider images={images} altBase={p.title} youtubeUrl={p.youtubeUrl} fit="cover" />
@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: { params: { handle: string
           </div>
 
           {/* Mua ngay tại: nằm ngay dưới slider */}
-          {p.marketplaces && <MarketplaceLinks links={p.marketplaces} />}
+          {p.marketplaces && <MarketplaceLinks links={p.marketplaces} productTitle={p.title} />}
         </div>
 
         {/* RIGHT */}
