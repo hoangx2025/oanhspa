@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import NavigationProgress from "@/components/NavigationProgress";
 
 interface Category {
   name: string;
@@ -66,6 +67,8 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      <NavigationProgress />
 
       {/* Main header */}
       <div className="mx-auto max-w-6xl px-4 py-4 flex items-center gap-4">
