@@ -8,31 +8,30 @@ export default function NavigationProgress() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const prevPath = useRef(pathname);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRequests = useRef(0);
 
   const start = useCallback(() => {
     setLoading(true);
     setProgress(15);
-    clearInterval(intervalRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
     let p = 15;
     intervalRef.current = setInterval(() => {
-      // Slow down as it approaches 90%
       const step = p < 50 ? Math.random() * 12 + 3 : Math.random() * 5 + 1;
       p = Math.min(p + step, 92);
       setProgress(p);
     }, 400);
 
-    // Safety: auto-complete after 15s so it never gets stuck
-    clearTimeout(timeoutRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      complete();
+      finish();
     }, 15000);
   }, []);
 
-  const complete = useCallback(() => {
-    clearInterval(intervalRef.current);
-    clearTimeout(timeoutRef.current);
+  const finish = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setProgress(100);
     setTimeout(() => {
       setLoading(false);
@@ -40,7 +39,7 @@ export default function NavigationProgress() {
     }, 350);
   }, []);
 
-  // Listen for link clicks to start loading
+  // Listen for link clicks → start on navigation
   useEffect(() => {
     function onClick(e: MouseEvent) {
       const a = (e.target as HTMLElement).closest("a");
@@ -61,19 +60,44 @@ export default function NavigationProgress() {
     return () => document.removeEventListener("click", onClick);
   }, [start]);
 
-  // Complete when pathname changes
+  // Intercept fetch → start/finish on API calls
+  useEffect(() => {
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const url = typeof args[0] === "string" ? args[0] : (args[0] as Request).url;
+      // Only track same-origin API & page requests, skip external
+      const isInternal = url.startsWith("/") || url.startsWith(window.location.origin);
+      if (isInternal) {
+        activeRequests.current++;
+        if (activeRequests.current === 1) start();
+      }
+      try {
+        return await originalFetch(...args);
+      } finally {
+        if (isInternal) {
+          activeRequests.current = Math.max(0, activeRequests.current - 1);
+          if (activeRequests.current === 0) finish();
+        }
+      }
+    };
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, [start, finish]);
+
+  // Complete when pathname changes (navigation done)
   useEffect(() => {
     if (pathname !== prevPath.current) {
       prevPath.current = pathname;
-      complete();
+      activeRequests.current = 0;
+      finish();
     }
-  }, [pathname, complete]);
+  }, [pathname, finish]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
-      clearInterval(intervalRef.current);
-      clearTimeout(timeoutRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
