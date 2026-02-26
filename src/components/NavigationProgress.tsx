@@ -101,14 +101,16 @@ export default function NavigationProgress() {
     };
   }, []);
 
-  if (!loading) return null;
-
   return (
-    <div className="h-[2px] w-full bg-rose-100 overflow-hidden">
+    <div className="relative h-0 w-full">
       <div
-        className="h-full bg-gradient-to-r from-rose-400 to-rose-600 transition-[width] duration-300 ease-out"
-        style={{ width: `${progress}%` }}
-      />
+        className={`absolute left-0 top-0 h-[2px] w-full overflow-hidden transition-opacity duration-200 ${loading ? "opacity-100" : "opacity-0"}`}
+      >
+        <div
+          className="h-full bg-gradient-to-r from-rose-400 to-rose-600 transition-[width] duration-300 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
     </div>
   );
 }
