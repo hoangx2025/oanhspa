@@ -54,7 +54,7 @@ export default function ProductVariants({ variants }: { variants: ProductVariant
 
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <div className="rounded-xl bg-zinc-50 px-3 py-2 text-sm">
-          <span className="opacity-70">Giá: </span>
+          <span className="opacity-70">Giá từ: </span>
           <span className="font-semibold">{formatVND(pickedVariant?.price ?? 0)}</span>
           {/* {pickedVariant?.compareAtPrice ? (
             <span className="ml-2 text-xs line-through opacity-50">{formatVND(pickedVariant.compareAtPrice)}</span>

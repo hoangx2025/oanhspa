@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
@@ -85,6 +86,8 @@ export async function POST(req: NextRequest) {
 
     return created;
   });
+
+  revalidatePath("/admin/products");
 
   return NextResponse.json(product, { status: 201 });
 }

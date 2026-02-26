@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { seoConfig } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Liên hệ",
+  description: `Liên hệ ${seoConfig.siteName} qua hotline, Zalo hoặc Messenger. Tư vấn mỹ phẩm Hàn Quốc chính hãng miễn phí.`,
+  alternates: { canonical: "/contact" },
+};
+
 export default function ContactPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

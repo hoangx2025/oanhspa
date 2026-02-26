@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Tin tức",
+  description: "Tin tức, mẹo làm đẹp, review mỹ phẩm Hàn Quốc mới nhất từ OANH SPA.",
+  alternates: { canonical: "/blogs" },
+};
+
 export default function BlogsPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">

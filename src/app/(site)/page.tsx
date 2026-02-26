@@ -1,9 +1,25 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import FlashSale from "@/components/FlashSale";
 import ProductGrid from "@/components/ProductGrid";
 import Tabs from "@/components/Tabs";
 import BrandShowcase from "@/components/BrandShowcase";
+import { WebSiteJsonLd } from "@/components/JsonLd";
 import { brands, hotWeek, productsByCategory, salesByCategory } from "@/lib/catalog";
+import { seoConfig } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: "Mỹ phẩm xách tay Hàn Quốc chính hãng",
+  description:
+    "OANH SPA - Chuyên mỹ phẩm xách tay Hàn Quốc chính hãng: skincare, serum, kem chống nắng, collagen, mặt nạ. Giao hàng toàn quốc, tư vấn miễn phí 24/7.",
+  openGraph: {
+    title: seoConfig.defaultTitle,
+    description: seoConfig.defaultDescription,
+    url: seoConfig.siteUrl,
+    images: [{ url: seoConfig.defaultOgImage, width: 1200, height: 630 }],
+  },
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const [brandList, hot, salesRanking] = await Promise.all([
@@ -27,6 +43,8 @@ export default async function HomePage() {
 
   return (
     <main>
+      <WebSiteJsonLd />
+
       {/* Hero */}
       <section className="bg-gradient-to-b from-rose-50 to-white border-b">
         <div className="mx-auto max-w-6xl px-4 py-10 md:py-14 grid gap-8 md:grid-cols-2 items-center">

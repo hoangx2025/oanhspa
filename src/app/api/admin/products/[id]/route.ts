@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
@@ -87,6 +88,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
     return updated;
   });
 
+  revalidatePath("/admin/products");
+  revalidatePath(`/admin/products/${params.id}`);
+  revalidatePath(`/products/${product.handle}`);
+
   return NextResponse.json(product);
 }
 
@@ -95,5 +100,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   if (authCheck(session)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await db.product.delete({ where: { id: Number(params.id) } });
+
+  revalidatePath("/admin/products");
+
   return NextResponse.json({ ok: true });
 }

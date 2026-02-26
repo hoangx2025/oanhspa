@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Giới thiệu",
+  description: "Giới thiệu về OANH SPA - Chuyên cung cấp mỹ phẩm xách tay Hàn Quốc chính hãng, uy tín, giá tốt nhất.",
+  alternates: { canonical: "/pages/about-us" },
+};
+
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
