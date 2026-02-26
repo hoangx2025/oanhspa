@@ -17,9 +17,9 @@ export function generateStaticParams() {
 
 function titleFromHandle(handle: string) {
   switch (handle) {
-    case "all": return "Tất cả sản phẩm";
+    case "all": return "Tất cả;
     case "my-pham": return "Mỹ phẩm";
-    case "san-pham-ban-chay": return "Sản phẩm bán chạy";
+    case "san-pham-ban-chay": return "Bán chạy";
     case "flash-sale": return "Flash Sale";
     default: return "Bộ sưu tập";
   }

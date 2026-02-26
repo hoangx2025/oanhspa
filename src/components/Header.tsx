@@ -93,7 +93,7 @@ export default function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm ml-6">
-          <Link className="hover:text-rose-600" href="/collections/all">Tất cả sản phẩm</Link>
+          <Link className="hover:text-rose-600" href="/collections/all">Tất cả</Link>
 
           {/* Danh mục dropdown */}
           <div className="relative group">
@@ -157,7 +157,7 @@ export default function Header() {
         <div className="md:hidden border-t bg-white">
           <nav className="mx-auto max-w-6xl px-4 py-3 flex flex-col text-sm">
             <Link className="py-2.5 hover:text-rose-600" href="/collections/all" onClick={closeMobile}>
-              Tất cả sản phẩm
+              Tất cả
             </Link>
 
             {/* Danh mục accordion */}
