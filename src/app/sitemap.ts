@@ -5,21 +5,6 @@ import { seoConfig } from "@/lib/seo";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = seoConfig.siteUrl;
 
-  // Fetch all products and their updatedAt
-  const products = await prisma.product.findMany({
-    select: { handle: true, updatedAt: true },
-  });
-
-  // Fetch all brands
-  const brands = await prisma.brand.findMany({
-    select: { slug: true, updatedAt: true },
-  });
-
-  // Fetch all categories
-  const categories = await prisma.category.findMany({
-    select: { slug: true, updatedAt: true },
-  });
-
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -65,26 +50,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const productPages: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${baseUrl}/products/${p.handle}`,
-    lastModified: p.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  try {
+    const [products, brands, categories] = await Promise.all([
+      prisma.product.findMany({ select: { handle: true, updatedAt: true } }),
+      prisma.brand.findMany({ select: { slug: true, updatedAt: true } }),
+      prisma.category.findMany({ select: { slug: true, updatedAt: true } }),
+    ]);
 
-  const brandPages: MetadataRoute.Sitemap = brands.map((b) => ({
-    url: `${baseUrl}/collections/all?brand=${b.slug}`,
-    lastModified: b.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
+    const productPages: MetadataRoute.Sitemap = products.map((p) => ({
+      url: `${baseUrl}/products/${p.handle}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
 
-  const categoryPages: MetadataRoute.Sitemap = categories.map((c) => ({
-    url: `${baseUrl}/collections/all?category=${c.slug}`,
-    lastModified: c.updatedAt,
-    changeFrequency: "weekly" as const,
-    priority: 0.6,
-  }));
+    const brandPages: MetadataRoute.Sitemap = brands.map((b) => ({
+      url: `${baseUrl}/collections/all?brand=${b.slug}`,
+      lastModified: b.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
 
-  return [...staticPages, ...productPages, ...brandPages, ...categoryPages];
+    const categoryPages: MetadataRoute.Sitemap = categories.map((c) => ({
+      url: `${baseUrl}/collections/all?category=${c.slug}`,
+      lastModified: c.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+
+    return [...staticPages, ...productPages, ...brandPages, ...categoryPages];
+  } catch {
+    return staticPages;
+  }
 }

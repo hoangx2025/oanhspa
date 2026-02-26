@@ -8,8 +8,12 @@ import { seoConfig, productUrl } from "@/lib/seo";
 import MarketplaceLinks from "@/components/marketplaceLinks";
 
 export async function generateStaticParams() {
-  const items = await allProducts();
-  return items.map((p) => ({ handle: p.handle }));
+  try {
+    const items = await allProducts();
+    return items.map((p) => ({ handle: p.handle }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
