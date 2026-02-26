@@ -28,7 +28,10 @@ export default async function FlashSale() {
         ) : null}
       </div>
 
-      <ProductGrid products={products.slice(0, 4)} />
+      <ProductGrid
+        products={products.slice(0, 4)}
+        gridClassName="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
+      />
 
       <div className="mt-6 flex items-center justify-between">
         <div className="text-sm opacity-70">* Dữ liệu đang lấy từ database (Turso cloud)</div>

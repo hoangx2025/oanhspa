@@ -14,7 +14,7 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
         aria-label={p.title}
       >
         {firstImg ? (
-          <div className="relative h-44 bg-white">
+          <div className="relative h-32 sm:h-44 bg-white">
             <Image
               src={firstImg}
               alt={p.title}
@@ -24,7 +24,7 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
             />
           </div>
         ) : (
-          <div className="h-44" />
+          <div className="h-32 sm:h-44" />
         )}
 
         <div className="absolute left-3 top-3 flex items-center gap-2">
@@ -37,14 +37,14 @@ export default function ProductCard({ p }: { p: UnifiedProduct }) {
         </div>
       </Link>
 
-      <div className="px-4 pt-3 pb-4">
-        <div className="text-xs uppercase tracking-widest text-rose-600">{p.brand}</div>
-        <Link href={`/products/${p.handle}`} className="mt-1 line-clamp-2 font-semibold leading-snug hover:text-rose-600">
+      <div className="px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4">
+        <div className="text-[10px] sm:text-xs uppercase tracking-widest text-rose-600">{p.brand}</div>
+        <Link href={`/products/${p.handle}`} className="mt-0.5 sm:mt-1 line-clamp-2 text-sm sm:text-base font-semibold leading-snug hover:text-rose-600">
           {p.title}
         </Link>
 
-        <div className="mt-3 flex items-center justify-between">
-          <div className="text-xs opacity-70">{p.category}</div>
+        <div className="mt-2 sm:mt-3 flex items-center justify-between">
+          <div className="text-[10px] sm:text-xs opacity-70">{p.category}</div>
         </div>
       </div>
     </div>

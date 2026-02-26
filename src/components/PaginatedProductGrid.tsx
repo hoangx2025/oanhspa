@@ -113,7 +113,7 @@ export default function PaginatedProductGrid({
     <>
       {/* onClick ở đây bắt sự kiện bubble từ tất cả <a> trong grid */}
       <div onClick={handleGridClick}>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
           {sliced.map((p) => (
             <ProductCard key={p.handle} p={p} />
           ))}
